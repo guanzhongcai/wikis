@@ -2216,10 +2216,14 @@ swagger serve -F=swagger swagger.json
 
 # 内存管理
 
+![image-20210620083543712](pictures/memory-span.png)
+
 - 遵循了操作系统的虚拟内存和物理内存映射的管理方法
 - page是8k
 - 分成67个不同大小规格的内存块区域，每个块都放在一起
 - 如果介于两个不同大小的内存卡之间，就放在大一级的区域中
+- bitmap中bit值为1表示span存值了，为0表示没有，当需要分配内存，从bitmap找有没有可复用的span
+- bitmap：该位置是否扫描过
 
 <img src="pictures/memory-67-blocks.png" alt="image-20210619081715848" style="zoom:50%;" />
 
