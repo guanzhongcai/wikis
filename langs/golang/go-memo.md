@@ -20,6 +20,44 @@
 
 
 
+## go的slice
+
+**`append()`这个函数在 `cap` 不够用的时候就会重新分配内存以扩大容量，而如果够用的时候不不会重新分享内存！**
+
+```go
+dir1 := path[:sepIndex:sepIndex]
+```
+
+代码使用了 Full Slice Expression，其最后一个参数叫“Limited Capacity”，于是，后续的 `append()` 操作将会导致重新分配内存。
+
+
+
+## 接口完整性检查
+
+```go
+type Shape interface {
+    Sides() int
+    Area() int
+}
+type Square struct {
+    len int
+}
+func (s* Square) Sides() int {
+    return 4
+}
+func main() {
+    s := Square{len: 5}
+    fmt.Printf("%d\n",s.Sides())
+}
+
+// 声明一个 _ 变量（没人用），其会把一个 nil 的空指针，从 Square 转成 Shape，这样，如果没有实现完相关的接口方法，编译器就会报错：
+var _ Shape = (*Square)(nil)
+```
+
+这样就做到了个强验证的方法。
+
+
+
 ## go的gc
 
 > go语言内置运行时Runtime，抛弃传统的内存分配策略，改为自主分配；使用google的Thread-Cache Malloc算法，自己管理内存池和预分配，不用每次内存分配都需要向进行系统调用。
@@ -45,6 +83,76 @@
   - heap：管理闲置span，需要时想操作系统申请内存
   - 
   - 分别为并启动多个线程管理，每个线程管理一部分被切割为不同大小的内存片，以后的使用直接向这些线程申请，避免锁粒度的性能消耗，使用完再返回给内存调度器
+
+
+
+## sync.Pool
+
+这个类设计的目的是用来短时间（2分钟内）保存和复用临时对象，以减少内存分配，降低CG压力。
+
+这个清理过程是在每次垃圾回收之前做的。垃圾回收是固定两分钟触发一次。
+
+```go
+package main
+ 
+import(
+    "sync"
+    "log"
+)
+ 
+func main(){
+    // 建立对象
+    var pipe = &sync.Pool{New:func()interface{}{return "Hello, BeiJing"}}
+     
+    // 准备放入的字符串
+    val := "Hello,World!"
+     
+    // 放入
+    pipe.Put(val)
+     
+    // 取出
+    log.Println(pipe.Get())
+     
+    // 再取就没有了,会自动调用NEW
+    log.Println(pipe.Get())
+}
+ 
+// 输出
+2014/09/30 15:43:30 Hello, World!
+2014/09/30 15:43:30 Hello, BeiJing
+```
+
+- 每次清理会将 Pool 中的所有对象都清理掉！
+
+- sync.Pool 的定位不是做类似连接池的东西，它的用途仅仅是增加对象重用的几率，减少 gc 的负担，而开销方面也不是很便宜的。
+
+[参考资料](https://www.cnblogs.com/-wenli/p/12325248.html)
+
+
+
+#### 性能提示
+
+Go 语言是一个高性能的语言，但并不是说这样我们就不用关心性能了，我们还是需要关心的。下面是一个在编程方面和性能相关的提示。
+
+- 如果需要把数字转字符串，使用 `strconv.Itoa()` 会比 `fmt.Sprintf()` 要快一倍左右
+- 尽可能地避免把`String`转成`[]Byte` 。这个转换会导致性能下降。
+- 如果在for-loop里对某个slice 使用 `append()`请先把 slice的容量很扩充到位，这样可以避免内存重新分享以及系统自动按2的N次方幂进行扩展但又用不到，从而浪费内存。
+- 使用`StringBuffer` 或是`StringBuild` 来拼接字符串，会比使用 `+` 或 `+=` 性能高三到四个数量级。
+- 尽可能的使用并发的 go routine，然后使用 `sync.WaitGroup` 来同步分片操作
+- 避免在热代码中进行内存分配，这样会导致gc很忙。尽可能的使用 `sync.Pool` 来重用对象。
+- 使用 lock-free的操作，避免使用 mutex，尽可能使用 `sync/Atomic`包。 （关于无锁编程的相关话题，可参看《[无锁队列实现](https://coolshell.cn/articles/8239.html)》或《[无锁Hashmap实现](https://coolshell.cn/articles/9703.html)》）
+- **使用 I/O缓冲，I/O是个非常非常慢的操作，使用 `bufio.NewWrite()` 和 `bufio.NewReader()` 可以带来更高的性能。**
+- 对于在for-loop里的固定的正则表达式，一定要使用 `regexp.Compile()` 编译正则表达式。性能会得升两个数量级。
+- 如果你需要更高性能的协议，你要考虑使用 [protobuf](https://github.com/golang/protobuf) 或 [msgp](https://github.com/tinylib/msgp) 而不是JSON，因为JSON的序列化和反序列化里使用了反射。
+- 你在使用map的时候，使用整型的key会比字符串的要快，因为整型比较比字符串比较要快。
+
+> bufio 是通过缓冲来提高效率
+>
+> 简单的说就是，把文件读取进缓冲（内存）之后再读取的时候就可以避免文件系统的io 从而提高速度。同理，在进行写操作时，先把文件写入缓冲（内存），然后由缓冲写入文件系统。看完以上解释有人可能会表示困惑了，直接把 内容->文件 和 内容->缓冲->文件相比， 缓冲区好像没有起到作用嘛。其实缓冲区的设计是为了存储多次的写入，最后一口气把缓冲区内容写入文件。下面会详细解释
+>
+>
+> 
+> 链接：[golang中bufio包的实现原理](https://blog.csdn.net/LiangWenT/article/details/78995468)
 
 ## go的chann
 
