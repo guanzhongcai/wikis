@@ -352,6 +352,18 @@ select无阻塞：
 
 
 
+## 系统调用
+
+Go语言那么C，所以，一定会有一些系统调用。Go语言主要是通过两个包完成的。一个是[os包](http://golang.org/pkg/os/)，一个是[syscall包](http://golang.org/pkg/syscall/)。
+
+这两个包里提供都是Unix-Like的系统调用，
+
+- syscall里提供了什么Chroot/Chmod/Chmod/Chdir…，Getenv/Getgid/Getpid/Getgroups/Getpid/Getppid…，还有很多如Inotify/Ptrace/Epoll/Socket/…的系统调用。
+
+- os包里提供的东西不多，主要是一个跨平台的调用。它有三个子包，Exec（运行别的命令）, Signal（捕捉信号）和User（通过uid查name之类的）
+
+
+
 ## MySQL索引
 
 - B+树
