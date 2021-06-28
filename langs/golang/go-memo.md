@@ -204,7 +204,155 @@ Go 语言是一个高性能的语言，但并不是说这样我们就不用关�
 - 在接收协程接收到新的缓冲消息时，会顺便触发阻塞读协程的重新运行，反之亦然。
 - 思考：通过通信来实现共享内存，而不是通过共享内存来实现通信。（CSP）
 
-## mysql索引
+
+
+## 内存分配
+
+**new** 是一个分配内存的内建函数，但不同于其他语言中同名的new所作的工作，**它只是将内存清零，而不是初始化内存**。new(T)为一个类型为T的新项目分配了值为零的存储空间并返回其地址，也就是一个类型为*T的值。用Go的术语来说，就是**它返回了一个指向新分配的类型为T的零值的指针**。
+
+`make(T, args)`函数的目的与`new(T)`不同。**它仅用于创建切片、map和chan（消息管道）**，并返回类型`T`（不是`*T`）的一个**被初始化了的**（不是**零**）实例。这种差别的出现是由于这三种类型实质上是对在使用前必须进行初始化的数据结构的引用。例如，切片是一个具有三项内容的描述符，包括指向数据（在一个数组内部）的指针、长度以及容量，在这三项内容被初始化之前，切片值为`nil`。对于切片、映射和信道，`make`初始化了其内部的数据结构并准备了将要使用的值。如：
+
+下面的代码分配了一个整型数组，长度为10，容量为100，并返回前10个数组的切片
+
+```go
+make([]int, 10, 100)
+```
+
+以下示例说明了`new`和`make`的不同。
+
+```go
+var p *[]int = new([]int)   // 为切片结构分配内存；*p == nil；很少使用
+var v  []int = make([]int, 10) // 切片v现在是对一个新的有10个整数的数组的引用
+
+// 不必要地使问题复杂化：
+var p *[]int = new([]int)
+fmt.Println(p) //输出：&[]
+
+*p = make([]int, 10, 10)
+fmt.Println(p) //输出：&[0 0 0 0 0 0 0 0 0 0]
+fmt.Println((*p)[2]) //输出： 0
+
+// 习惯用法:
+v := make([]int, 10)
+fmt.Println(v) //输出：[0 0 0 0 0 0 0 0 0 0]
+```
+
+
+
+## 函数闭包
+
+```go
+func nextNum() func() int {
+  i, j := 1,1
+  return func() int {
+    var tmp = i + j
+    i, j = j, tmp
+    return tmp
+  }
+}
+
+// 打出下一个斐波拉契数
+func main() {
+  nextNumFunc := nextNum()
+  for i := 0; i < 10; i++ {
+    fmt.Println(nextNumFunc())
+  }
+}
+
+```
+
+
+
+## goroutine的并发安全性
+
+**如果一个goroutine没有被阻塞，那么别的goroutine就不会得到执行**。这并不是真正的并发，如果你要真正的并发，你需要在你的main函数的第一行加上下面的这段代码：
+
+```go
+import "runtime"
+...
+runtime.GOMAXPROCS(4)
+```
+
+
+
+## Channel
+
+### Channel的阻塞
+
+注意，channel默认上是阻塞的，也就是说，如果Channel满了，就阻塞写，如果Channel空了，就阻塞读。于是，我们就可以使用这种特性来同步我们的发送和接收端。
+
+**Channel阻塞的这个特性还有一个好处是，可以让我们的goroutine在运行的一开始就阻塞在从某个channel领任务，这样就可以作成一个类似于线程池一样的东西。关于这个程序我就不写了。我相信你可以自己实现的。**
+
+
+
+### **Channel select阻塞的Timeout**
+
+一般有两种方法：一种是阻塞但有timeout，一种是无阻塞。
+
+给select设置上timeout:
+
+```go
+    for {
+        timeout_cnt := 0
+        select {
+        case msg1 := <-c1:
+            fmt.Println("msg1 received", msg1)
+        case msg2 := <-c2:
+            fmt.Println("msg2 received", msg2)
+        case  <-time.After(time.Second * 30)：
+            fmt.Println("Time Out")
+            timout_cnt++
+        }
+        if time_cnt > 3 {
+            break
+        }
+    }
+```
+
+select无阻塞：
+
+```go
+    for {
+        select {
+        case msg1 := <-c1:
+            fmt.Println("received", msg1)
+        case msg2 := <-c2:
+            fmt.Println("received", msg2)
+        default: //default会导致无阻塞
+            fmt.Println("nothing received!")
+            time.Sleep(time.Second)
+        }
+    }
+```
+
+
+
+## 定时器
+
+`SetTimeout`通知一次：
+
+```go
+{
+    timer := time.NewTimer(2*time.Second)
+    <- timer.C
+    fmt.Println("timer expired!")
+}
+```
+
+`SetInterval`通知多次：
+
+```go
+{
+    ticker := time.NewTicker(time.Second)
+    for t := range ticker.C {
+        fmt.Println("Tick at", t)
+    }
+}
+```
+
+
+
+## MySQL索引
 
 - B+树
 - 是由二叉树演变而来的N叉数，即子节点数不是2个，是n个

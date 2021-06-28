@@ -91,3 +91,20 @@ World Wide Web Consortium 万维网联盟，W3C标准包括：
 - required：必须要填写的字段，否则提交不了！
 - pattern：正则表达式，百度搜索“常用正则表达式”，[常用正则表达式大全](https://blog.csdn.net/qianhaohong/article/details/53435253)
 
+
+
+## iframe内联框架
+
+```html
+<iframe src="//player.bilibili.com/player.html?aid=55631961&bvid=BV1x4411V75C&cid=97257967&page=11" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> 
+</iframe>
+```
+
+使用a+iframe实现在本网页内加载网页
+
+```html
+<iframe src="" name="hello" frameborder="0" width="1000px" height="800px">
+</iframe>
+<a href="https://blog.kuangstudy.com" target="hello">点击跳转</a>
+```
+

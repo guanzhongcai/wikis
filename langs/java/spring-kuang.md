@@ -6,7 +6,6 @@
 - Spring Framework创始人Rod Johnson，音乐学博士
 - [Spring Design Philosophy](https://docs.spring.io/spring-framework/docs/5.2.0.RELEASE/spring-framework-reference/overview.html#overview)
 - 解决企业应用开发的复杂性
-- 
 
 
 
@@ -28,6 +27,8 @@ spring是如何简化java开发的？4种关键策略：
 <img src="images/modern-java.png" alt="image-20210227082548984" style="zoom:40%;" />
 
 
+
+![image-20210628071101206](images/spring-usage-demo.png)
 
 - 自构建bean教程：https://docs.spring.io/spring-framework/docs/5.2.0.RELEASE/spring-framework-reference/core.html#beans-factory-metadata
 
