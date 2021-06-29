@@ -32,7 +32,7 @@ IP虚拟服务器（IP Virtual Server），基本上是一种高效的layer-4交
 
 是docker原厂出品，很轻量，本机只消耗几十MB。但功能相对于k8s太少，比如：滚动更新、回滚等操作，swarm手动实现起来很复杂。也能大规模化，但实现起来还是太费事。
 
-阿里云也在2019年取消swarm，值支持k8s。
+阿里云也在2019年取消swarm，只支持k8s。
 
 
 
@@ -148,7 +148,7 @@ Pod控制器是k8s的灵魂！自主式Pod、控制器管理Pod，类型有：
 
 #### ReplicationController 和ReplicaSet
 
-负责pod创建和销毁。用来确保容器应用的副本数十种保持在用户定义的副本数，即如果有容器异常退出，会自动创建新的Pod替代。如果多出来，也会自动回收。新版本中后者是取代前者的，后者也是大型项目中使用。
+**负责pod创建和销毁**。用来确保容器应用的副本数始终保持在用户定义的副本数，即如果有容器异常退出，会自动创建新的Pod替代。如果多出来，也会自动回收。**新版本中后者是取代前者的，后者也是大型项目中使用**。
 
 
 
@@ -205,7 +205,7 @@ DaemonSet确保全部Node上运行一个Pod的副本。当有Node加入集群时
 
 ## 网络通讯模式
 
-k8s的网络模型假定了所有Pod都在一个苦役互相连通（通过IP）的扁平化网络空间中。这在GCE（Google Compute Engine）里面是线程的网络模型，k8s嘉定这个网络已经存在。
+k8s的网络模型假定了所有Pod都在一个互相连通（通过IP）的扁平化网络空间中。这在GCE（Google Compute Engine）里面是线程的网络模型，k8s假定这个网络已经存在。
 
 在私有云里搭建k8s集群，我们需要自己实现网络互通，将不同节点上的docker容器之间的互相访问先打通，再运行k8s。
 
@@ -215,7 +215,7 @@ k8s的网络模型假定了所有Pod都在一个苦役互相连通（通过IP）
 
 
 
-Flannel 是CoreOS团队针对k8s使得网络规划服务，它是让集群中的不同节点主机创建的docker容器都具有全集群唯一的虚拟IP地址。而且它还能在这些IP地址之间建立一个覆盖网络（overlay network），通过这个覆盖网络，将数据包原封不动地传递到目标容器内。
+**Flannel** 是CoreOS团队针对k8s使得网络规划服务，它**是让集群中的不同节点主机创建的docker容器都具有全集群唯一的虚拟IP地址**。而且它还能在这些IP地址之间建立一个**覆盖网络（overlay network）**，通过这个覆盖网络，将数据包原封不动地传递到目标容器内。
 
 ![k8s-flannel.png](./pictures/k8s-flannel.png)
 
@@ -235,14 +235,14 @@ etcd之flannel提供说明：
 - 同一个pod内部通信：共享了同一个网络命名空间，共享同一个linux协议栈
 
 - pod1至pod2：
-  - 不再同一台主机：pod的地址是与docker0在同一个网段的，但docker0网段与宿主网卡是两个不同的IP网段，并且不同Node之间的通信只能通过宿主机的物理网卡进行。将pod的IP和所在Node的IP关联起来，通过这个关联让Pod可以互相访问。
-  - 在同一台主机：由docker0网桥直接转发请求至pod2，不需要结果flannel
+  - 不在同一台主机：pod的地址是与docker0在同一个网段的，但docker0网段与宿主网卡是两个不同的IP网段，并且不同Node之间的通信只能通过宿主机的物理网卡进行。将pod的IP和所在Node的IP关联起来，通过这个关联让Pod可以互相访问。
+  - 在同一台主机：由docker0网桥直接转发请求至pod2，不需要经过 flannel
 
 
 
 - pod到service的网络：目前基于性能考虑，全部为iptables维护和转发；最新版为lvs。
 
-- pod到外网：pod向外网发送请求，查找路由表，转发数据包到宿主机的网卡，宿主网卡完成路由选择后，iptables执行masquerade，把源IP更改为宿主网卡的IP，然后向外网服务器发送请求。
+- pod到外网：pod向外网发送请求，查找路由表，转发数据包到宿主机的网卡，宿主网卡完成路由选择后，iptables执行masquerade（伪装，掩藏），把源IP更改为宿主网卡的IP，然后向外网服务器发送请求。
 
 - 外网访问Pod：Service
 
@@ -303,3 +303,45 @@ CICD构建 With Jenkins
 kubeadm源码修改：目的是修改默认1年的证书限制
 
 k8s高可用构建
+
+
+
+## kubectl 常用命令
+
+```bash
+# kubectl查看pod
+kubectl get pod -n default -o wide
+
+# kubectl查看pod日志
+kubectl -n default log -f tomcat-6bfcb9b549-fs2zt
+
+# kubectl进入到pod容器内
+kubectl -n default exec -it tocat-imageid
+
+# kubectl查看service
+kubectl get svr -n default -o wide
+
+# kubectl查看deployment
+kubectl get deployment -n default -o wide
+
+# kubectl查看node
+kubectl get node
+
+# kubectl查看资源文件内容
+kubectl get ing tomcat n default -o json
+
+# kubectl创建命名空间
+kubectl create namespace dev
+
+# kubectl通过yml文件创建资源对象
+kubectl create -f tomecat-deployment.yml --namespace=default
+```
+
+
+
+## 参考资料
+
+- [kubectl 常用命令](https://jingyan.baidu.com/article/d8072ac4087cbdac94cefd5c.html)
+
+- [Kubernetes教程(K8s入门到精通)](https://www.bilibili.com/video/BV1w4411y7Go?p=3&spm_id_from=pageDriver)
+
