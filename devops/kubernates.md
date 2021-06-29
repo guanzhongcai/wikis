@@ -339,9 +339,41 @@ kubectl create -f tomecat-deployment.yml --namespace=default
 
 
 
+## sandbox
+
+Sandbox（沙箱）是指一种技术，在这种技术中，软件运行在操作系统受限制的环境中。由于该软件在受限制的环境中运行，即使一个闯入该软件的入侵者也不能无限制访问操作系统提供设施；获得该软件控制权的黑客造成的损失也是有限的。此外，如果攻击者要获得对操作系统的完全控制，他们就不得不攻克沙箱限制。Sandbox也提供深度防御，许多PaaS系统都提供了一个实时运行环境，它的核心就是一个沙箱应用程序，如Azu re和Google App Engime。 
+
+
+
+## containerd
+
+一个行业标准的容器运行时，强调**简单性**、**健壮性**和**可移植性**: www.containerd.io
+
+**containerd**可用作 Linux 和 Windows 的守护程序。它管理其主机系统的完整容器生命周期，从图像传输和存储到容器执行和监督，再到低级存储到网络附件等等。
+
+docker由 docker-client ,dockerd,containerd,docker-shim,runc组成，所以containerd是docker的基础组件之一
+
+![img](docker/containerd.jpg)
+
+从k8s的角度看，可以选择 containerd 或 docker 作为运行时组件：Containerd 调用链更短，组件更少，更稳定，占用节点资源更少
+
+
+
+调用链
+Docker 作为 k8s 容器运行时，调用关系如下：
+**kubelet --> docker shim （在 kubelet 进程中） --> dockerd --> containerd**
+
+Containerd 作为 k8s 容器运行时，调用关系如下：
+**kubelet --> cri plugin（在 containerd 进程中） --> containerd**
+
+
+
+
 ## 参考资料
 
 - [kubectl 常用命令](https://jingyan.baidu.com/article/d8072ac4087cbdac94cefd5c.html)
 
 - [Kubernetes教程(K8s入门到精通)](https://www.bilibili.com/video/BV1w4411y7Go?p=3&spm_id_from=pageDriver)
+
+- [sandbox-百度百科](https://baike.baidu.com/item/Sandbox/9280944?fr=aladdin)
 
