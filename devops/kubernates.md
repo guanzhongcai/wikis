@@ -369,6 +369,186 @@ Containerd 作为 k8s 容器运行时，调用关系如下：
 
 
 
+
+## 推荐k8s版本
+
+1.15。因为1.16开始废弃了很多API，生态还未完善！
+
+kubernetes：舵手；飞行员
+
+
+
+Docker容器化封装应用程序的缺点：
+
+- 单机使用，无法有效集群
+- 随着容器数量的上升，管理成本攀升
+- 没有有效的容灾/自愈机制
+- 没有预设编排模板，无法实现快速、大规模容器调度
+- 没有统一的配置管理中心工具
+- 没有容器生命周期的管理工具
+- 没有图形化运维管理工具
+- ....
+
+Kubernetes优势：
+
+- 自动装箱，水平扩展，自我修复
+- 服务发现和负载均衡
+- 自动发布（默认滚动发布模式）
+- 集中化配置管理和秘钥管理
+- 存储编排
+- 任务批处理运行
+- ....
+
+
+
+# Kubernetes快速入门
+
+![image-20210701195228379](docker/k8s-master-nodes.png)
+
+四组基本概念
+
+- Pod/Pod控制器
+- Name/Namespace
+- Label/Label选择器
+- Service/Ingress
+
+
+
+## Pod
+
+- Pod是K8S里能够被运行的最小的逻辑单元（原子单元）
+- 1个Pod里面可以运行多个容器，它们共享 UTS+NET+IPC名称空间（container隔离了pid、net、user等6个）
+- 可以把Pod理解成豌豆荚，而同一Pod内的每个容器是一颗颗豌豆
+- 一个Pod里运行多个容器，又叫：边车（Sidecar）模式
+- Pod可以直接启动，可没有任何控制器
+
+
+
+## Pod控制器
+
+- Pod控制器是Pod启动的一种模板，依赖保证在k8s里启动的Pod应始终按照人们的预期运行（副本数、生命周期、健康状态检查...)
+- K8S内提供了众多的Pod控制器，常用的有以下：
+  - Deployment
+  - DeamonSet
+  - ReplicaSet
+  - StatefulSet
+  - Job
+  - Cronjob
+
+
+
+CKA证：
+
+Certified Kubernetes Administrator，是Linux基金会和CNCF（Cloud Native Computing Foundation）官方退出的全球k8s管理员认证，国内外都认可。
+
+
+
+## minikube
+
+在线练习：https://kubernetes.io/docs/tutorials/hello-minikube/
+
+执行button：Launch Terminal
+
+
+
+## kubeadm
+
+已经可以用在生成环境
+
+https://kubernetes.io/docs/reference/setup-tools/kubeadm/
+
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+主要提供两个命令：
+
+```bash
+kubeadm init
+kubeadm join
+```
+
+centos7的系统要求：
+
+1. 2核心2G内存及以上
+2. 无swap分区或禁用
+
+
+
+### 安装步骤
+
+关闭防火墙：
+
+```bash
+systemctl stop firewalld
+systemctl disable firewalld
+```
+
+关闭selinux
+
+```bash
+sed -i 's/enforcing/disabled/' /etc/selinux/config # 永久
+setenforce 0 # 临时
+```
+
+关闭swap（k8s机制虚拟内存以提供性能）
+
+```bash
+swapoff -a #临时
+sed -ri 's/.*swap.*/#&/' /etc/fstab # 永久
+```
+
+在master添加hosts
+
+```bash
+vi /etc/hosts
+192.168.106.3 k8smaster
+192.168.106.4 k8snode
+```
+
+设置网桥参数
+
+```bash
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sudo sysctl --system
+```
+
+时间同步
+
+```bash
+yum install ntpdate -y
+ntpdate time.windows.com
+```
+
+[装docker](https://www.runoob.com/docker/centos-docker-install.html)：
+
+```bash
+curl -fsSL https://get.docker.com | bash -s docker --mirror aliyun
+```
+
+配置加速器加速下载：
+
+```json
+{
+  "registry-mirrors": ["https://registry.docker-cn.com"]
+}
+```
+
+开机启动：
+
+```bash
+systemctl enable docker.service
+```
+
+
+
+
+
 ## 参考资料
 
 - [kubectl 常用命令](https://jingyan.baidu.com/article/d8072ac4087cbdac94cefd5c.html)
@@ -376,4 +556,6 @@ Containerd 作为 k8s 容器运行时，调用关系如下：
 - [Kubernetes教程(K8s入门到精通)](https://www.bilibili.com/video/BV1w4411y7Go?p=3&spm_id_from=pageDriver)
 
 - [sandbox-百度百科](https://baike.baidu.com/item/Sandbox/9280944?fr=aladdin)
+
+- [centos7虚拟机没有ip地址](https://blog.csdn.net/qq_41622739/article/details/94826266)
 
