@@ -545,7 +545,72 @@ curl -fsSL https://get.docker.com | bash -s docker --mirror aliyun
 systemctl enable docker.service
 ```
 
+[Kubernetes阿里云YUM更新源k8s国内源](https://blog.csdn.net/frdevolcqzyxynjds/article/details/107076450)
 
+```bash
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+```
+
+安装kubeadm、kubelet、kubectl：
+
+```bash
+yum install -y kubelet-1.19.4 kubeadm-1.19.4 kubectl-1.19.4 -y
+systemctl enable kubelet && systemctl start kubelet
+```
+
+开机启动：
+
+```bash
+systemctl enable kubelet.service
+```
+
+kubelet: 运行在cluster所有节点上，负责启动pod和容器
+
+kubeadm：用于初始化cluster的一个工具
+
+kubectl：kubectl是kubernetes命令行工具，通过kubectl可以部署和管理应用，查看各种资源，创建，删除，和更新组件
+
+```bash
+kubeadm init \
+--apiserver-advertise-address=192.168.106.4 \
+--image-repository registry.aliyuncs.com/google_containers \
+--kubernetes-version v1.19.4 \
+--service-cidr=10.96.0.0/12 \
+--pod-network-cidr=10.244.0.0/16
+```
+
+按照完成的提示继续输入3个命令：
+
+```bash
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+查看nodes：
+
+```bash
+[root@localhost ~]# kubectl get nodes
+NAME                    STATUS     ROLES    AGE   VERSION
+localhost.localdomain   NotReady   master   14m   v1.19.4
+```
+
+修改主机名：
+
+（原名称：localhost.localdomain）
+
+```bash
+hostnamectl set-hostname k8smaster # 使用这个命令会立即生效且重启也生效
+hostname # 查看下
+```
 
 
 
