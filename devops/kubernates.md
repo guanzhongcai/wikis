@@ -612,6 +612,41 @@ hostnamectl set-hostname k8smaster # 使用这个命令会立即生效且重启�
 hostname # 查看下
 ```
 
+node节点加入master：
+
+```bash
+kubeadm join 192.168.106.4:6443 --token hiowkn.6syn5tydik6tefib \
+    --discovery-token-ca-cert-hash sha256:8347172640e4817c6d4cb9ef850a2b8b970b3541fecce8889a68c1dbf500cd92 
+```
+
+master上下载 kube-flannel.yml
+
+```bash
+# /etc/hosts中添加：
+# 199.232.68.133 raw.githubusercontent.com
+wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+kubectl apply -f kube-flannel.yml
+```
+
+查看运行时pod：
+
+```bash
+# -n: namespace
+kubectl get pods -n kube-system
+```
+
+部署nginx
+
+```bash
+# kubectl create $controller $name --image=$image 镜像会运行在pod里
+kubectl create deployment nginx --image=nginx
+kubectl expose deployment nginx --port=8082 --type=NodePort
+kubectl get pod,svc
+```
+
+访问地址：http://NodeIP:Port
+
 
 
 ## 参考资料
@@ -623,4 +658,6 @@ hostname # 查看下
 - [sandbox-百度百科](https://baike.baidu.com/item/Sandbox/9280944?fr=aladdin)
 
 - [centos7虚拟机没有ip地址](https://blog.csdn.net/qq_41622739/article/details/94826266)
+
+- [Kubernetes-kubectl命令出现错误The connection to the server localhost:8080 was refused - did you specif...](https://blog.csdn.net/qq_24046745/article/details/94405188)
 
