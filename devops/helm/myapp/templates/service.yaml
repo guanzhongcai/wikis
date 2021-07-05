@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-svr   # 服务名
+spec:
+  selector:         # pod选择器定义
+    app: myapp
+  ports:
+  - protocal: TCP
+    port: 80
+    targetPort: 80

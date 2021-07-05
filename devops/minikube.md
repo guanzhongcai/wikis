@@ -302,6 +302,39 @@ curl http://localhost:8001/version
 - **kubectl logs** - 打印 pod 和其中容器的日志
 - **kubectl exec** - 在 pod 中的容器上执行命令
 
+```bash
+[root@k8smaster ~]# kubectl exec nginx-6799fc88d8-cq7df -- bash
+[root@k8smaster ~]# kubectl exec -it nginx-6799fc88d8-cq7df -- bash
+```
+
+
+
+# 使用 Service 暴露您的应用
+
+尽管每个 Pod 都有一个唯一的 IP 地址，但是如果没有 Service ，这些 IP 不会暴露在群集外部。Service 允许您的应用程序接收流量。
+
+*Kubernetes 的 Service 是一个抽象层，它定义了一组 Pod 的逻辑集，并为这些 Pod 支持外部流量暴露、负载平衡和服务发现。*
+
+- 将 Pod 暴露给外部通信
+- 跨多个 Pod 的负载均衡
+- 使用标签(Label)
+
+
+
+Service 也可以用在 ServiceSpec 标记`type`的方式暴露
+
+- *`ClusterIP`* (默认) - 在集群的内部 IP 上公开 Service 。这种类型使得 Service 只能从集群内访问。
+
+- *`NodePort`* - 使用 NAT 在集群中每个选定 Node 的相同端口上公开 Service 。使用`<NodeIP>:<NodePort>` 从集群外部访问 Service。是 ClusterIP 的超集。
+
+- *`LoadBalancer`* - 在当前云中创建一个外部负载均衡器(如果支持的话)，并为 Service 分配一个固定的外部IP。是 NodePort 的超集。
+
+- *`ExternalName`* - 通过返回带有该名称的 `CNAME` 记录，使用任意名称(由 spec 中的`externalName`指定)公开 Service。不使用代理。这种类型需要`kube-dns`的v1.7或更高版本。
+
+  > CNAME (canonical name) — an alias to an existing host.
+  >
+  > CNAME(规范名称)——现有主机的别名。
+
 
 
 
