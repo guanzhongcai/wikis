@@ -59,6 +59,14 @@ IP虚拟服务器（IP Virtual Server），基本上是一种高效的layer-4交
 
 **高可用集群副本数据最好是大于等于3的奇数个！**
 
+
+
+![img](../../web-wiki/uploads/k8s-framework.png)
+
+
+
+![img](k8s/k8s-architecture.png)
+
 ### master组件
 
 **主机负责管理群集。**主服务器协调集群中的所有活动，例如调度应用程序，维护应用程序的所需状态，扩展应用程序以及推出新的更新。

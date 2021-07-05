@@ -1,17 +1,11 @@
-## 创建 Minikube 集群[ ](https://kubernetes.io/zh/docs/tutorials/hello-minikube/#创建-minikube-集群)
+## 创建 Minikube 集群
 
 启动本地 kubernetes 集群
 
 ```bash
 minikube start
 
-minikube start --vm-driver=docker  --image-mirror-country="cn"   --registry-mirror=https://f1z25q5p.mirror.aliyuncs.com
-
-
-作者：我不是吴亦凡_fdfa
-链接：https://www.jianshu.com/p/0280e51c5b4d
-来源：简书
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+minikube start --vm-driver=docker --image-mirror-country="cn" --registry-mirror=https://f1z25q5p.mirror.aliyuncs.com
 ```
 
 在浏览器中打开 Kubernetes 仪表板（Dashboard）
@@ -322,3 +316,4 @@ curl http://localhost:8001/version
 
 - [kubernetes-basics](https://kubernetes.io/zh/docs/tutorials/kubernetes-basics/deploy-app/deploy-intro/)
 
+- [使用kubernetes 官网工具kubeadm部署kubernetes(使用阿里云镜像)](https://www.cnblogs.com/tylerzhou/p/10971336.html)
