@@ -86,6 +86,67 @@ myapp                                   - chart 包目录名
 
 我们要在k8s中部署一个网站应用，需要编写**deployment、service、ingress**三个配置文件，刚才通过helm create命令已经创建好了。
 
+### 5.2.使用helm生成k8s应用部署配置文件
+
+### 5.3.提取k8s应用部署配置文件中的参数，作为chart包参数。
+
+我们通过提**取配置中的参数**，**注入模版变量，模版表达式**将配置文件转化为**模版文件**，helm在运行的时候**根据参数动态的将模版文件**渲染成最终的配置文件。
+
+> {{  }} 两个花括号包裹的内容为模版表达式
+
+
+
+### 5.4.通过helm命令安装/更新应用
+
+**安装应用：**
+
+```bash
+helm install ./myapp
+```
+
+命令详解：
+
+```bash
+#命令格式: helm install  --set key=value   chart包目录
+#–set 参数可以指定多个参数，他的值会覆盖values.yaml定义的值，对象类型数据可以用 . (点)分割属性名,例子:  --set apiAppResources.requests.cpu=1
+
+$ helm install     \
+--set replicas=2   \
+--set host=www.xxxx.com \
+ ./myapp
+```
+
+**更新应用：**
+
+命令格式: `helm upgrade release名字  chart包目录`
+
+```
+$ helm upgrade myapp ./myapp
+```
+
+命令详解：
+
+```bash
+$ helm upgrade -i     \   # 当release不存在的时候则安装，存在则更新
+--set replicas=2   \
+--set host=www.xxxx.com \
+ myapp ./myapp
+```
+
+
+
+### 6.6.调试
+
+编写好chart包的模版之后，我们可以给helm命令加上`--debug --dry-run` 两个参数，**让helm输出模版结果，但是不把模版输出结果交给k8s处理**。
+
+```bash
+# helm install命令类似，加上--debug --dry-run两个参数即可
+$ helm upgrade **--debug --dry-run** -i  \
+--set replicas=2  \
+--set host=www.xxxx.com \
+ myapp ./myapp
+```
+
 
 
 ## 参考资料
