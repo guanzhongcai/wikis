@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: myapp-svr   # 服务名
+  name: {{ .Release.Name }}-svc #服务名
 spec:
-  selector:         # pod选择器定义
-    app: myapp
+  selector: #pod选择器定义
+    app: {{ .Release.Name }}
   ports:
-  - protocal: TCP
+  - protocol: TCP 
     port: 80
     targetPort: 80

@@ -1,23 +1,23 @@
-apiVersion: app/v1beta2
+apiVersion: apps/v1beta2
 kind: Deployment
-metadat:
-  name: myapp         # deployment应用名
+metadata:
+  name: {{ .Release.Name }}  #deployment应用名
   labels:
-    app: myapp        # deployment应用标签定义
-  spec:
-    replicas: 1       # pod副本数
-    selector:
-      matchLabels:
-        app: myapp    # pod选择器标签
-    template:
-      metadata:
-        labels:
-          app: myapp  # pod标签定义
-      spec:
-        containers:
-          - name: myapp # 容器名
-            image: xxxxxxx:1.7.9  #镜像地址
-            ports:
-              - name: http
-                containerPort: 80
-                protocol: TCP
+    app: {{ .Release.Name }}          #deployment应用标签定义
+spec:
+  replicas: {{ .Values.replicas}}           #pod副本数
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}          #pod选择器标签
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}          #pod标签定义
+    spec:
+      containers:
+        - name: {{ .Release.Name }}           #容器名
+          image: {{ .Values.image }}:{{ .Values.imageTag }}    #镜像地址
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
