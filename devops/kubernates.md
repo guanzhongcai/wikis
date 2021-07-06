@@ -655,6 +655,38 @@ kubectl get pod,svc
 
 访问地址：http://NodeIP:Port
 
+命令缩写：
+
+```bash
+kubectl get node(s)
+kubectrl get svc (service(s))
+kubectrl get deploy(ment)
+kubectl get pod(s)
+```
+
+registry加速`/etc/docker/daemon.json`：
+
+```json
+{
+  "registry-mirrors": ["https://gg3gwnry.mirror.aliyuncs.com"]
+}
+```
+
+
+
+构建deploy.yml
+
+```bash
+docker build -t $imageName .
+
+# --dry-run 尝试运行
+kubectl create deploy $deployName --image=$imageName --dry-run -o yaml > deploy.yaml
+
+kubectl apply -f deploy.yaml
+
+kubectl get pods
+```
+
 
 
 ## 参考资料

@@ -1,3 +1,7 @@
+# minikube
+
+
+
 ## 创建 Minikube 集群
 
 启动本地 kubernetes 集群
@@ -203,7 +207,7 @@ service/monitoring-influxdb    ClusterIP   10.111.169.94   <none>        8083/TC
 
 ```shell
 kubectl delete service hello-node
-kubectl delete deployment hello-node
+kubectl delete deployment hello-node # pod属于deploy，所以，删除deploy，就删除了pod
 ```
 
 可选地，停止 Minikube 虚拟机（VM）：
@@ -250,6 +254,104 @@ kubectl version
 kubectl cluster-info
 
 kubectl get nodes
+```
+
+
+
+`kubernetes.yaml`示例：
+
+```y
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-deployment
+  labels:
+    app: system
+spec:
+  selector:
+    matchLabels:
+      app: system
+  template:
+    metadata:
+      labels:
+        app: system
+    spec:
+      containers:
+      - name: system-container
+        image: system:1.0-SNAPSHOT
+        ports:
+        - containerPort: 9080
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 9080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-deployment
+  labels:
+    app: inventory
+spec:
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+    spec:
+      containers:
+      - name: inventory-container
+        image: inventory:1.0-SNAPSHOT
+        ports:
+        - containerPort: 9080
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 9080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: system-service
+spec:
+  type: NodePort
+  selector:
+    app: system
+  ports:
+  - protocol: TCP
+    port: 9080
+    targetPort: 9080
+    nodePort: 31000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+spec:
+  type: NodePort
+  selector:
+    app: inventory
+  ports:
+  - protocol: TCP
+    port: 9080
+    targetPort: 9080
+    nodePort: 32000
+```
+
+应用配置：
+
+```bash
+kubectl apply -f kubernetes.yaml
 ```
 
 
@@ -477,6 +579,23 @@ kubectl rollout undo deployments/kubernetes-bootcamp
 ```
 
 
+
+# Web 界面 (Dashboard)
+
+## 部署 Dashboard UI
+
+默认情况下不会部署 Dashboard。可以通过以下命令部署：
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.2.0/aio/deploy/recommended.yaml
+```
+
+
+
+```bash
+# 查看当前运行的服务端口和名称
+netstat -nlpt
+```
 
 
 
