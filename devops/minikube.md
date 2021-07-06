@@ -337,9 +337,112 @@ Service 也可以用在 ServiceSpec 标记`type`的方式暴露
 
 
 
+Service 匹配一组 Pod 是使用 [标签(Label)和选择器(Selector)](https://kubernetes.io/zh/docs/concepts/overview/working-with-objects/labels), 它们是允许对 Kubernetes 中的对象进行逻辑操作的一种分组原语。标签(Label)是附加在对象上的键/值对，可以以多种方式使用:
+
+- **指定用于开发，测试和生产的对象**
+- **嵌入版本标签**
+- **使用 Label 将对象进行分类**
+
+*你也可以在创建 Deployment 的同时用 `--expose`创建一个 Service 。*
+
+![img](../images/module_04_labels.svg)
+
+#### Step 1 Create a new service
+
+```bash
+# create a new service and expose it to external traffic
+kubectl expose deployment/kubernetes-bootcamp --type="NodePort" --port 8080
+
+kubectl get services
+
+kubectl describe services/kubernetes-bootcamp
+```
+
+#### Step 2: Using labels
+
+```bash
+kubectl describe deployment
+
+# -l: label
+kubectl get pods -l app=kubernetes-bootcamp
+
+kubectl get services -l app=kubernetes-bootcamp
+
+# Get the name of the Pod and store it in the POD_NAME environment variable:
+export POD_NAME=$(kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+echo Name of the Pod: $POD_NAME
+
+# apply a new label: use the label command followed by the object type, object name and the new label
+kubectl label pods $POD_NAME version=v1
+
+kubectl describe pods $POD_NAME
+
+# query the list of pods using the new label:
+kubectl get pods -l version=v1
+```
 
 
-## 参考资料
+
+#### Step 3 Deleting a service
+
+```bash
+kubectl delete service -l app=kubernetes-bootcamp
+```
+
+
+
+# 运行应用程序的多个实例
+
+- 扩缩一个 Deployment
+
+- 用 kubectl 扩缩应用程序
+- *在运行 kubectl run 命令时，你可以通过设置 --replicas 参数来设置 Deployment 的副本数。*
+
+- *扩缩是通过改变 Deployment 中的副本数量来实现的。*
+
+- 一旦有了多个应用实例，就可以没有宕机地滚动更新。
+
+> 服务 (Service)有一种负载均衡器类型，可以将网络流量均衡分配到外部可访问的 Pods 上。服务将会一直通过端点来监视 Pods 的运行，保证流量只分配到可用的 Pods 上。
+
+#### Step 1: Scaling a deployment
+
+```bash
+# see the ReplicaSet created by the Deployment:
+kubectl get rs
+
+# scale the Deployment to 4 replicas
+kubectl scale deployments/kubernetes-bootcamp --replicas=4
+
+# list your Deployments 
+kubectl get deployments
+
+# check the number of Pods
+kubectl get pods -o wide
+
+# check the Deployment events log
+kubectl describe deployments/kubernetes-bootcamp
+```
+
+
+
+#### Step 2: Load Balancing
+
+```bash
+# check the Service is load-balancing the traffic and find out the exposed IP and Port
+kubectl describe services/kubernetes-bootcamp
+```
+
+
+
+#### Step 3: Scale Down
+
+```bash
+kubectl scale deployments/kubernetes-bootcamp --replicas=2
+```
+
+
+
+# 参考资料
 
 - https://kubernetes.io/zh/docs/tutorials/hello-minikube/
 
