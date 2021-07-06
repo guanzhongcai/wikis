@@ -442,6 +442,44 @@ kubectl scale deployments/kubernetes-bootcamp --replicas=2
 
 
 
+# 执行滚动更新
+
+- 使用 kubectl 执行滚动更新。
+- 在 Kubernetes 中，更新是经过版本控制的，任何 Deployment 更新都可以恢复到以前的（稳定）版本。
+- *滚动更新允许通过使用新的实例逐步更新 Pod 实例从而实现 Deployments 更新，停机时间为零。*
+
+#### Step 1: Update the version of the app
+
+```bash
+# update the image of the application to version 2, use the set image command, followed by the deployment name and the new image version:
+kubectl set image deployments/kubernetes-bootcamp kubernetes-bootcamp=jocatalin/kubernetes-bootcamp:v2
+```
+
+
+
+#### Step 2: Verify an update
+
+```bash
+# confirm the update by running the rollout status command:
+kubectl rollout status deployments/kubernetes-bootcamp
+```
+
+
+
+#### Step 3: Rollback an update
+
+```bash
+# 实验：deploy an image tagged with v10 
+kubectl set image deployments/kubernetes-bootcamp kubernetes-bootcamp=gcr.io/google-samples/kubernetes-bootcamp:v10
+
+# roll back the deployment to your last working version, use the rollout undo command:
+kubectl rollout undo deployments/kubernetes-bootcamp
+```
+
+
+
+
+
 # 参考资料
 
 - https://kubernetes.io/zh/docs/tutorials/hello-minikube/
