@@ -679,12 +679,28 @@ registry加速`/etc/docker/daemon.json`：
 ```bash
 docker build -t $imageName .
 
-# --dry-run 尝试运行
+# --dry-run 空运行
 kubectl create deploy $deployName --image=$imageName --dry-run -o yaml > deploy.yaml
 
 kubectl apply -f deploy.yaml
 
 kubectl get pods
+```
+
+### Ingress
+
+是加在service之上的，把一组service再暴露出去，并提供负载均衡
+
+
+
+## Dashboard
+
+```bash
+docker pull kubernetesui/dashboard
+
+kubectl apply -f recommened.yml
+
+kubectl get pod -n kubernetes-dashboard
 ```
 
 
