@@ -689,7 +689,33 @@ kubectl get pods
 
 ### Ingress
 
-是加在service之上的，把一组service再暴露出去，并提供负载均衡
+是加在service之上的，把一组service再暴露出去，并提供负载均衡。外部请求加入k8s集群必经之入口：
+
+![image-20210708072318730](k8s/ingress.png)
+
+Ingress是k8s集群中的一个API资源对象，相当于一个集群网关，我们可以自定义路由规则来转发、管理、暴露服务（一组pod），比较灵活。
+
+Ingress不是k8s内置的，需要单独安装，且有多种类型：
+
+- Google Cloud Load Balancer
+- ingress-nginx: 是使用nginx作为反向代理和负载均衡器的k8s的Ingress控制器
+- Contour
+- Istio
+- ...
+
+
+
+minikube中开启Ingress：
+
+```bash
+minikube addons enable ingress
+```
+
+> 可以从阿里云后台那里找到k8s，然后搜索ingress关键词的镜像，找到一些国外的稀缺镜像，可pull下来
+>
+> https://cr.console.aliyun.com/images/cn-hangzhou/google_containers/nginx-ingress-controller
+
+
 
 
 
