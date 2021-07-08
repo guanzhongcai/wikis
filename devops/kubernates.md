@@ -717,6 +717,47 @@ minikube addons enable ingress
 
 
 
+Ingress规则文件 `ingress-nginx-rule.yaml`：
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+	name: k8s-ingress
+spec:
+	rules:
+	- host: www.abc.com
+		http:
+			paths:
+			- pathType: Prefix
+				path: /
+				backend:
+					service:
+						name: nginx
+						port:
+							number: 80
+```
+
+应用规则：
+
+```bash
+kubectl apply -f ingress-nginx-rule.yaml
+```
+
+查看Ingress：
+
+```bash
+kubectl get ing(ress)
+```
+
+删除之前的规则残留：
+
+```bash
+kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+```
+
+
+
 
 
 ## Dashboard
