@@ -9,7 +9,8 @@
 ```bash
 minikube start
 
-minikube start --vm-driver=docker --image-mirror-country="cn" --registry-mirror=https://f1z25q5p.mirror.aliyuncs.com
+# 第一次start会默认下载kubernetes组件，使用阿里云镜像加速
+minikube start --vm-driver=docker --image-mirror-country="cn" --registry-mirror=https://n8bn2y81.mirror.aliyuncs.com
 ```
 
 在浏览器中打开 Kubernetes 仪表板（Dashboard）
@@ -602,11 +603,9 @@ netstat -nlpt
 # 参考资料
 
 - https://kubernetes.io/zh/docs/tutorials/hello-minikube/
-
 - [Katacoda搭建和使用教程](https://developer.aliyun.com/article/752183)
-
 - [katacoda官方提供的各技术栈教程（docker、consul、k8s...)](https://www.katacoda.com/courses)
-
 - [kubernetes-basics](https://kubernetes.io/zh/docs/tutorials/kubernetes-basics/deploy-app/deploy-intro/)
-
 - [使用kubernetes 官网工具kubeadm部署kubernetes(使用阿里云镜像)](https://www.cnblogs.com/tylerzhou/p/10971336.html)
+- [kubectl：启用 shell 自动补全功能](https://kubernetes.io/zh/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management)
+
