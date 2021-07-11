@@ -102,6 +102,16 @@ myapp                                   - chart 包目录名
 
 我们要在k8s中部署一个网站应用，需要编写**deployment、service、ingress**三个配置文件，刚才通过helm create命令已经创建好了。
 
+- chart.yml: 包括Chart的名称、描述、类型、版本号和应用的版本号
+- values.yml: 包含了Chart的所有可用的配置项，及其默认值；在安装Chart时传递的配置项会复写这些默认值；全部可用的配置项都在这里
+- charts目录：chart子目录，包含的是子chart
+- templates目录：这个目录中包含的是k8s资源声明的模板文件；在安装时，Helm会把模板文件和配置项的值结合起来，得到k8s资源定义，并应用到k8s上
+- Helm Chart有特定的语法：Char模板中可以通过 .Values来应用配置项的值；还可以使用模板函数来进行格式化；Chart模板还支持if/else和for循环等
+- deployment.yaml：本质上就是k8s上deployment资源声明，只不过部分被模板化了
+- 如果你的应用需要其他类型的k8s资源声明，如ConfigMap或Secret，可以在templates目录下添加相应的模板文件
+
+
+
 ### 5.2.使用helm生成k8s应用部署配置文件
 
 ### 5.3.提取k8s应用部署配置文件中的参数，作为chart包参数。
@@ -109,6 +119,36 @@ myapp                                   - chart 包目录名
 我们通过提**取配置中的参数**，**注入模版变量，模版表达式**将配置文件转化为**模版文件**，helm在运行的时候**根据参数动态的将模版文件**渲染成最终的配置文件。
 
 > {{  }} 两个花括号包裹的内容为模版表达式
+
+```bash
+# 支持管道用法：把.Values.test的配置值转为大写后，再添加引号
+{{ .Values.test | upper | quote}}
+```
+
+Helm Chart模板中可以使用的内置对象：
+
+| 名称         | 说明                             |
+| ------------ | -------------------------------- |
+| Release      | 创建的Helm Release的信息         |
+| Values       | 配置项的内容                     |
+| Chart        | 来自于Chart.yaml的元数据         |
+| Files        | 访问文件的函数的集合             |
+| Capabilities | k8s集群支持的能力，与k8s版本相关 |
+| Template     | 当前模板的信息                   |
+
+Helm Chart模板中可以使用的一些函数：
+
+| 函数名        | 说明                |
+| ------------- | ------------------- |
+| default       | 指定默认值          |
+| printf        | 字符串格式          |
+| nindent       | 添加缩进            |
+| date          | 日期格式化          |
+| b64enc/b64dec | base64编码与解码    |
+| regexMatch    | 正则表达式匹配      |
+| lookup        | 查找k8s集群中的资源 |
+
+完整版函数列表文档：https://helm.sh/docs/chart_template_guide/function_list/
 
 
 
