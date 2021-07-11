@@ -802,6 +802,67 @@ kubectl get pod -n kubernetes-dashboard
 
 
 
+# Secret
+
+`Secret` 对象类型用来保存敏感信息，例如密码、OAuth 令牌和 SSH 密钥。 将这些信息放在 `secret` 中比放在 [Pod](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/) 的定义或者 [容器镜像](https://kubernetes.io/zh/docs/reference/glossary/?all=true#term-image) 中来说更加安全和灵活。 参阅 [Secret 设计文档](https://git.k8s.io/community/contributors/design-proposals/auth/secrets.md) 获取更多详细信息。
+
+Secret 是一种包含少量敏感信息例如密码、令牌或密钥的对象。 这样的信息可能会被放在 Pod 规约中或者镜像中。 用户可以创建 Secret，同时系统也创建了一些 Secret。
+
+> **注意：**
+>
+> Kubernetes Secret 默认情况下存储为 base64-编码的、非加密的字符串。 默认情况下，能够访问 API 的任何人，或者能够访问 Kubernetes 下层数据存储（etcd） 的任何人都可以以明文形式读取这些数据。 为了能够安全地使用 Secret，我们建议你（至少）：
+>
+> 1. 为 Secret [启用静态加密](https://kubernetes.io/zh/docs/tasks/administer-cluster/encrypt-data/)；
+> 2. [启用 或配置 RBAC 规则](https://kubernetes.io/zh/docs/reference/access-authn-authz/authorization/)来限制对 Secret 的读写操作。 要注意，任何被允许创建 Pod 的人都默认地具有读取 Secret 的权限。
+
+
+
+Secret三种类型：
+
+- Service Account: 用来访问k8s API，由k8s自动创建，并且会自动挂载到pod的 `/run/secrets/kubernetes.io/serviceacount`目录中
+
+  ```bash
+  kubectl get pod -n kube-system
+  # 查看k8s自己的Secret设置
+  kubectl exec kube-proxy-fb85x -n kube-system -it -- ls /run/secrets/kubernetes.io/serviceacount
+  ca.crt   namespace    token
+  ```
+
+  
+
+- Opaque: base64编码格式的Secret，用来存储密码、密钥等
+
+- kubernetes.io/dockerconfigjson: 用来存储私有 docker Registry的认证信息
+
+
+
+## Secret 概览
+
+要使用 Secret，Pod 需要引用 Secret。 Pod 可以用三种方式之一来使用 Secret：
+
+- 作为挂载到一个或多个容器上的 [卷](https://kubernetes.io/zh/docs/concepts/storage/volumes/) 中的[文件](https://kubernetes.io/zh/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod)。
+- 作为[容器的环境变量](https://kubernetes.io/zh/docs/concepts/configuration/secret/#using-secrets-as-environment-variables)
+- 由 [kubelet 在为 Pod 拉取镜像时使用](https://kubernetes.io/zh/docs/concepts/configuration/secret/#using-imagepullsecrets)
+
+
+
+## Secret 的类型 
+
+在创建 Secret 对象时，你可以使用 [`Secret`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#secret-v1-core) 资源的 `type` 字段，或者与其等价的 `kubectl` 命令行参数（如果有的话）为其设置类型。 Secret 的类型用来帮助编写程序处理 Secret 数据。
+
+Kubernetes 提供若干种内置的类型，用于一些常见的使用场景。 针对这些类型，Kubernetes 所执行的合法性检查操作以及对其所实施的限制各不相同。
+
+| 内置类型                              | 用法                                     |
+| ------------------------------------- | ---------------------------------------- |
+| `Opaque`                              | 用户定义的任意数据                       |
+| `kubernetes.io/service-account-token` | 服务账号令牌                             |
+| `kubernetes.io/dockercfg`             | `~/.dockercfg` 文件的序列化形式          |
+| `kubernetes.io/dockerconfigjson`      | `~/.docker/config.json` 文件的序列化形式 |
+| `kubernetes.io/basic-auth`            | 用于基本身份认证的凭据                   |
+| `kubernetes.io/ssh-auth`              | 用于 SSH 身份认证的凭据                  |
+| `kubernetes.io/tls`                   | 用于 TLS 客户端或者服务器端的数据        |
+| `bootstrap.kubernetes.io/token`       | 启动引导令牌数据                         |
+
 
 
 ## 参考资料
