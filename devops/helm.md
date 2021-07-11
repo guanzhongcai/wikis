@@ -45,6 +45,10 @@ Helm是k8s的包管理工具，类似Linux系统常用的 apt、yum等包管理�
 
 所有这些资源声明组成了应用的安装包，Helm称之为Chart
 
+![chart-3-envs](helm/chart-3-envs.png)
+
+可在 [ArtifactHub](https://artifacthub.io/)上查找Helm Chart可用包。
+
 
 
 ## 4.安装helm
