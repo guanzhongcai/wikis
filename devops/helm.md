@@ -35,6 +35,18 @@ Helm是k8s的包管理工具，类似Linux系统常用的 apt、yum等包管理�
 
 
 
+比如，在安装PostgreSQL时，我们可能会需要如下资源：
+
+- 实际运行postgresql的Deployment或StatefulSet
+- 允许其他应用访问的Service
+- 数据存储需要的PersistenceVolumeClaim或PersistenceVolume
+- 保存数据库配置的ConfigMap
+- 保存数据库密码的Secret
+
+所有这些资源声明组成了应用的安装包，Helm称之为Chart
+
+
+
 ## 4.安装helm
 
 helm主要包括helm客户端和Tiller服务端两部分，Tiller部署在k8s集群中。

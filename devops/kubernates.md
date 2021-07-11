@@ -832,6 +832,35 @@ Secret三种类型：
 
 - Opaque: base64编码格式的Secret，用来存储密码、密钥等
 
+  生成base64编码：
+
+  ```bash
+  echo -n "admin" | base64
+  YWRtaW4
+  ```
+
+  opaque-secret.yml:
+
+  ```yaml
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: mysecret
+  type: Opaque
+  data:
+    password: Z29vZGx1Y2sxMjM=
+    username: YMRtaW4=
+  ```
+
+  应用：
+
+  ```bash
+  kubectl apply -f opaque-secret.yml
+  kubectl get secret
+  ```
+
+  后续可把此Secret加载到volume中，或导出到环境变量中！
+
 - kubernetes.io/dockerconfigjson: 用来存储私有 docker Registry的认证信息
 
 
