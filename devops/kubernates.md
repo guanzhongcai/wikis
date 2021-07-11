@@ -772,6 +772,38 @@ kubectl get pod -n kubernetes-dashboard
 
 
 
+## Helm
+
+[`Kubernetes Helm`](https://github.com/kubernetes/helm) 是一个用于管理预配置 Kubernetes 资源包的工具，也就是 Kubernetes 图表。
+
+使用 Helm 来：
+
+- 查找和使用打包为 Kubernetes 图表的流行软件
+
+- 将你自己的应用程序共享为 Kubernetes 图表
+
+- 为你的 Kubernetes 应用程序创建可重现的构建
+
+- 智能管理你的 Kubernetes 清单文件
+
+- 管理 Helm 包的发布
+
+  
+
+## Kompose
+
+[`Kompose`](https://github.com/kubernetes/kompose) 是一个帮助 Docker Compose 用户迁移到 Kubernetes 的工具。
+
+使用 Kompose：
+
+- 将 Docker Compose 文件翻译成 Kubernetes 对象
+- 从本地 Docker 开发转到通过 Kubernetes 管理你的应用程序
+- 转换 Docker Compose v1 或 v2 版本的 `yaml` 文件或[分布式应用程序包](https://docs.docker.com/compose/bundles/)
+
+
+
+
+
 ## 参考资料
 
 - [kubectl 常用命令](https://jingyan.baidu.com/article/d8072ac4087cbdac94cefd5c.html)
@@ -784,3 +816,4 @@ kubectl get pod -n kubernetes-dashboard
 
 - [Kubernetes-kubectl命令出现错误The connection to the server localhost:8080 was refused - did you specif...](https://blog.csdn.net/qq_24046745/article/details/94405188)
 
+- [Kubernetes 包含多个内置工具来帮助你使用 Kubernetes 系统](https://kubernetes.io/zh/docs/reference/tools/)
