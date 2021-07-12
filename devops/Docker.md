@@ -678,6 +678,14 @@ stop_signal: SIGUSR1
 
 
 
+### save
+
+```bash
+docker save -o imagexxx.tar imagexxx:0.25.0
+```
+
+
+
 ## docker-compose
 
 - `-p, --project-name NAME` 指定项目名称，默认使用所在目录名称作为项目名

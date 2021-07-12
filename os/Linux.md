@@ -2,6 +2,31 @@
 
 
 
+## Linux中rz和sz命令用法详解
+
+`rz，sz`是Linux/Unix同Windows进行ZModem文件传输的命令行工具。优点就是不用再开一个sftp工具登录上去上传下载文件。
+`sz`：将选定的文件发送（send）到本地机器
+`rz`：运行该命令会弹出一个文件选择窗口，从本地选择文件上传到Linux服务器
+安装命令：
+
+```bash
+yum install lrzsz
+```
+
+从服务端发送文件到客户端：
+
+```bash
+sz filename
+```
+
+从客户端上传文件到服务端：
+
+```
+rz
+```
+
+
+
 ## 需熟练掌握的命令
 
 - 文件系统结构和基本操作 ls/chmod/chown/rm/find/ln/cat/mount/mkdir/tar/gzip …
@@ -18,7 +43,11 @@
 
 
 
-### lsof
+### dd
+
+
+
+## lsof
 
 lsof = list open files
 
@@ -63,7 +92,7 @@ kill  -HUP `lsof -t -c sshd`
 
 
 
-### tcpdump
+## tcpdump
 
 用简单的话来定义tcpdump，就是：dump the traffic on a network，根据使用者的定义对网络上的数据包进行截获的包分析工具。 tcpdump可以将网络中传送的数据包的“头”完全截获下来提供分析。它支持针对网络层、协议、主机、网络或端口的过滤，并提供and、or、not等逻辑语句来帮助你去掉无用的信息。
 
@@ -97,7 +126,7 @@ tcpdump 对截获的数据并没有进行彻底解码，数据包内的大部分
 
 
 
-### iptables
+## iptables
 
 - iptables是Linux [内核](https://baike.baidu.com/item/内核/108410)集成的 IP 信息包过滤系统，有利于在 Linux 系统上更好地控制 IP 信息包过滤和[防火墙](https://baike.baidu.com/item/防火墙/52767)配置。
 
@@ -194,13 +223,9 @@ iptables –A INPUT –s 192.168.132.0 –p tcp –m multiport –dport 8080,808
 
 
 
-参考资料：
+## 参考资料
 
 - [iptables入门指南 --- iptables详解 ---iptbales 防火墙](https://www.cnblogs.com/liang2580/articles/8400140.html)
-
-
-
-### dd
 
 
 

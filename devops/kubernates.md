@@ -451,7 +451,22 @@ Certified Kubernetes Administrator，是Linux基金会和CNCF（Cloud Native Com
 
 
 
-## minikube
+## 容器生命周期
+
+![container-lifetime](k8s/siliconvally/container-lifetime.png)
+
+- Init C: Init container，初始化容器，加载本地的容器文件等操作
+- Main C：主容器操作
+- START：容器执行之前的操作
+- STOP：容器停止后的操作
+- Liveness：生存检测
+- readiness：就绪检测
+
+
+
+
+
+# minikube
 
 在线练习：https://kubernetes.io/docs/tutorials/hello-minikube/
 
@@ -459,7 +474,7 @@ Certified Kubernetes Administrator，是Linux基金会和CNCF（Cloud Native Com
 
 
 
-## kubeadm
+# kubeadm
 
 已经可以用在生成环境
 
@@ -481,7 +496,7 @@ centos7的系统要求：
 
 
 
-### 安装步骤
+## 安装步骤
 
 关闭防火墙：
 
@@ -687,7 +702,7 @@ kubectl apply -f deploy.yaml
 kubectl get pods
 ```
 
-### Ingress
+## Ingress
 
 是加在service之上的，把一组service再暴露出去，并提供负载均衡。外部请求加入k8s集群必经之入口：
 
@@ -703,7 +718,7 @@ Ingress不是k8s内置的，需要单独安装，且有多种类型：
 - Istio
 - ...
 
-
+![ingress-nginx](k8s/siliconvally/ingress-nginx.jpeg)
 
 minikube中开启Ingress：
 
@@ -714,6 +729,10 @@ minikube addons enable ingress
 > 可以从阿里云后台那里找到k8s，然后搜索ingress关键词的镜像，找到一些国外的稀缺镜像，可pull下来
 >
 > https://cr.console.aliyun.com/images/cn-hangzhou/google_containers/nginx-ingress-controller
+
+![ingress-nginx-framework](k8s/siliconvally/ingress-nginx-framework.jpeg)
+
+ingress-nginx官网：https://kubernetes.github.io/ingress-nginx/
 
 
 
