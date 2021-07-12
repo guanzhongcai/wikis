@@ -678,10 +678,11 @@ stop_signal: SIGUSR1
 
 
 
-### save
+### save & load
 
 ```bash
 docker save -o imagexxx.tar imagexxx:0.25.0
+docker load -i imagexxx.tar
 ```
 
 

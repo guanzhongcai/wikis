@@ -221,6 +221,42 @@ iptables –A INPUT –s 192.168.132.0 –p tcp –m multiport –dport 8080,808
 
 
 
+# bash 和 sh 的区别
+
+shell的中文意思就是贝壳，其实比较类似于我们内核的壳。简而言之就是只要能够操作应用程序的接口都能够称为SHELL。狭义的shell指的是命令行方面的软件，广义的SHELL则包括图形界面。
+
+1. 发现区别
+   同样的 shell 脚本，使用 sh xxx.sh 和 bash xxx.sh 调用执行时结果不同，使用 sh 时会输出许多匪夷所思的结果，而使用 bash 时就完全按照预期。
+
+2. 探究区别
+   在一般的 Linux 系统中（例如 Ubuntu ）中，使用 sh 调用执行 shell 脚本相当于打开了 bash 的 POSIX 标准模式，这种模式在一定程度上保证了脚本的跨系统性（跨 UNIX 系统），即 /bin/sh 相当于 /bin/bash --posix，所以二者的一个区别就是有没有开启 POSIX 标准模式。
+
+　　因为bash是sh的增强版本，在我们平常实地操作的时候如果sh这个命令不灵了我们应当使用bash。
+
+
+
+# POSIX解决什么问题
+
+1. [POSIX解决什么问题](https://www.jianshu.com/p/7a17b34e05ee)
+
+> 一般情况下，应用程序通过应用编程接口(API)而不是直接通过系统调用来编程(即并不需要和内核提供的系统调用来编程)。一个API定义了一组应用程序使用的编程接口。它们可以实现成调用一个系统，也可以通过调用多个系统来实现，而完全不使用任何系统调用也不存在问题。实际上，**API可以在各种不同的操作系统上实现给应用程序提供完全相同的接口**，而它们本身在这些系统上的实现却可能迥异。如下图，当应用程序调用printf()函数时，printf函数会调用C库中的printf，继而调用C库中的write，C库最后调用内核的write()。
+
+![img](linux/app-syscall-kernal.png)
+
+应用程序、C库和内核之间的关系
+
+从程序员的角度看，系统调用无关紧要，只需要跟API打交道。相反，内核只跟系统调用打交道，库函数及应用程序是怎么系统调用不是内核所关心的。
+
+> **完成同一功能，不同内核提供的系统调用（一个函数）是不同的**，例如创建进程，linux下是fork函数，windows下是creatprocess函数。好，我现在在linux下写一个程序，用到fork函数，那么这个程序该怎么往windows上移植？我需要把源代码里的fork通通改成creatprocess，然后重新编译...
+
+主流的操作系统有两种，一种是Windows系统，另一种是Linux系统。由于操作系统的不同，API又分为Windows API和Linux API。在Windows平台开发出来的软件在Linux上无法运行，在Linux上开发的软件在Windows上又无法运行，这就导致了软件移植困难，POSIX(Protabl Operation System 可移植操作系统规范)应运而生。
+
+**posix标准的出现就是为了解决这个问题。**linux和windows都要实现基本的posix标准，linux把fork函数封装成posix_fork（随便说的），windows把creatprocess函数也封装成posix_fork，都声明在unistd.h里。这样，程序员编写普通应用时候，只用包含unistd.h，调用posix_fork函数，程序就在源代码级别可移植了。
+
+2. posix 是什么？
+
+可移植操作系统接口Portable Operating System Interface of UNIX，POSIX标准定义了操作系统应该为应用程序提供的接口标准，是IEEE为要在各种UNIX操作系统上运行的软件而定义的一系列API标准的总称。
+
 
 
 ## 参考资料

@@ -732,7 +732,12 @@ minikube addons enable ingress
 
 ![ingress-nginx-framework](k8s/siliconvally/ingress-nginx-framework.jpeg)
 
-ingress-nginx官网：https://kubernetes.github.io/ingress-nginx/
+ingress-nginx官网：https://kubernetes.github.io/ingress-nginx/deploy
+
+```bash
+kubectl apply -f mandatory.yml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/baremetal/deploy.yaml
+```
 
 
 
