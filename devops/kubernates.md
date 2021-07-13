@@ -67,6 +67,12 @@ IP虚拟服务器（IP Virtual Server），基本上是一种高效的layer-4交
 
 ![img](k8s/k8s-architecture.png)
 
+这张图表展示了包含所有相互关联组件的 Kubernetes 集群：
+
+![Kubernetes 组件](../images/components-of-kubernetes.svg)
+
+
+
 ### master组件
 
 **主机负责管理群集。**主服务器协调集群中的所有活动，例如调度应用程序，维护应用程序的所需状态，扩展应用程序以及推出新的更新。
@@ -931,3 +937,6 @@ Kubernetes 提供若干种内置的类型，用于一些常见的使用场景。
 - [Kubernetes-kubectl命令出现错误The connection to the server localhost:8080 was refused - did you specif...](https://blog.csdn.net/qq_24046745/article/details/94405188)
 
 - [Kubernetes 包含多个内置工具来帮助你使用 Kubernetes 系统](https://kubernetes.io/zh/docs/reference/tools/)
+
+- [Kube YAML-Validating Kubernetes objects](https://kubeyaml.com/)
+
