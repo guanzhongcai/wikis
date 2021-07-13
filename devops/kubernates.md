@@ -308,6 +308,29 @@ k8s会自动调用容器和pod调度到对应的节点！
 
 相当于linux中的yum安装包管理器
 
+官网教程：https://helm.sh/zh/docs/intro/quickstart/
+
+`helm install` 命令可以从多个来源进行安装：
+
+- chart 的仓库（如上所述）
+- 本地 chart 压缩包（`helm install foo foo-0.1.1.tgz`）
+- 解压后的 chart 目录（`helm install foo path/to/foo`）
+- 完整的 URL（`helm install foo https://example.com/charts/foo-1.2.3.tgz`）
+
+
+
+在编辑 chart 时，可以通过 `helm lint` 验证格式是否正确。
+
+当准备将 chart 打包分发时，你可以运行 `helm package` 命令：
+
+```bash
+helm create deis-workflow
+Creating deis-workflow
+
+helm package deis-workflow
+deis-workflow-0.1.0.tgz
+```
+
 
 
 ## 运维
