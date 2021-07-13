@@ -924,6 +924,44 @@ Kubernetes 提供若干种内置的类型，用于一些常见的使用场景。
 
 
 
+# pod 访问service服务
+
+这里涉及到k8s里面一个重要的概念service。它是一个服务的抽象，通过label（k8s会根据service和pod直接的关系创建endpoint，可以通过kubectl get ep查看）关联到后端的pod容器。
+
+Service分配的ip叫cluster ip是一个虚拟ip（相对固定，除非删除service），这个ip只能在k8s集群内部使用，如果service需要对外提供，只能使用Nodeport方式映射到主机上，使用主机的ip和端口对外提供服务。（另外还可以使用LoadBalance方式，但这种方式是在gce这样的云环境里面使用的 ）。
+
+节点上面有个kube-proxy进程，这个进程从master apiserver获取信息，感知service和endpoint的创建，然后做两个事：
+
+1. 为每个service 在集群中每个节点上面创建一个随机端口，任何该端口上面的连接会代理到相应的pod
+
+2. 集群中每个节点安装iptables规则，用于clusterip + port路由到上一步定义的随机端口上面，所以集群中每个node上面都有service的转发规则：
+
+
+
+# pod 与 pod 容器之间
+
+这种类型又可以分为两种情况：
+
+1. 两个pod在一台主机上面
+
+2. 两个pod分布在不同主机之上
+
+针对第一种情况，就比较简单了，就是docker默认的docker网桥互连容器。
+
+第二种情况需要更为复杂的网络模型了，k8s官方推荐的是使用flannel组建一个大二层扁平网络，pod的ip分配由flannel统一分配，通讯过程也是走flannel的网桥。
+
+```bash
+docker --daemon --bip=172.17.18.1/24 
+```
+
+注意其中的“--bip=172.17.18.1/24”这个参数，它限制了所在节点容器获得的IP范围。
+
+每个node上面都会创建一个flannel0虚拟网卡，用于跨node之间通讯。所以容器直接可以直接使用pod id进行通讯。
+
+跨节点通讯时，发送端数据会从docker0路由到flannel0虚拟网卡，接收端数据会从flannel0路由到docker0，这是因为flannel会添加一个路由
+
+
+
 ## 参考资料
 
 - [kubectl 常用命令](https://jingyan.baidu.com/article/d8072ac4087cbdac94cefd5c.html)
@@ -940,3 +978,5 @@ Kubernetes 提供若干种内置的类型，用于一些常见的使用场景。
 
 - [Kube YAML-Validating Kubernetes objects](https://kubeyaml.com/)
 
+- [K8S 容器之间通讯方式](https://www.cnblogs.com/linyouyi/p/11557771.html)
+- 
