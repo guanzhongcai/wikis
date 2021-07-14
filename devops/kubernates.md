@@ -985,6 +985,92 @@ docker --daemon --bip=172.17.18.1/24
 
 
 
+# 配置最佳实践
+
+本文档来自于：https://kubernetes.io/zh/docs/concepts/configuration/overview/
+
+## 一般配置提示
+
+- 定义配置时，请指定最新的稳定 API 版本。
+
+- 在推送到集群之前，配置文件应存储在版本控制中。 这允许您在必要时快速回滚配置更改。 它还有助于集群重新创建和恢复。
+
+- 使用 YAML 而不是 JSON 编写配置文件。虽然这些格式几乎可以在所有场景中互换使用，但 YAML 往往更加用户友好。
+
+- 只要有意义，就将相关对象分组到一个文件中。 一个文件通常比几个文件更容易管理。 请参阅[guestbook-all-in-one.yaml](https://github.com/kubernetes/examples/tree/master/guestbook/all-in-one/guestbook-all-in-one.yaml) 文件作为此语法的示例。
+
+- 另请注意，可以在目录上调用许多`kubectl`命令。 例如，你可以在配置文件的目录中调用`kubectl apply`。
+
+- 除非必要，否则不指定默认值：简单的最小配置会降低错误的可能性。
+
+- 将对象描述放在注释中，以便更好地进行内省。
+- 如果可能，不要使用独立的 Pods（即，未绑定到 [ReplicaSet](https://kubernetes.io/zh/docs/concepts/workloads/controllers/replicaset/) 或 [Deployment](https://kubernetes.io/zh/docs/concepts/workloads/controllers/deployment/) 的 Pod）。 如果节点发生故障，将不会重新调度独立的 Pods。
+- 在创建相应的后端工作负载（Deployment 或 ReplicaSet），以及在需要访问它的任何工作负载之前创建 [服务](https://kubernetes.io/zh/docs/concepts/services-networking/service/)。
+- 一个可选（尽管强烈推荐）的[集群插件](https://kubernetes.io/zh/docs/concepts/cluster-administration/addons/) 是 DNS 服务器。DNS 服务器为新的 `Services` 监视 Kubernetes API，并为每个创建一组 DNS 记录。 如果在整个集群中启用了 DNS，则所有 `Pods` 应该能够自动对 `Services` 进行名称解析。
+
+- 除非绝对必要，否则不要为 Pod 指定 `hostPort`。 将 Pod 绑定到`hostPort`时，它会限制 Pod 可以调度的位置数，因为每个 `<hostIP, hostPort, protocol>`组合必须是唯一的。 如果您没有明确指定 `hostIP` 和 `protocol`，Kubernetes 将使用 `0.0.0.0` 作为默认 `hostIP` 和 `TCP` 作为默认 `protocol`。
+
+- 如果您只需要访问端口以进行调试，则可以使用 [apiserver proxy](https://kubernetes.io/zh/docs/tasks/access-application-cluster/access-cluster/#manually-constructing-apiserver-proxy-urls)或 [`kubectl port-forward`](https://kubernetes.io/zh/docs/tasks/access-application-cluster/port-forward-access-application-cluster/)。
+
+- 如果您明确需要在节点上公开 Pod 的端口，请在使用 `hostPort` 之前考虑使用 [NodePort](https://kubernetes.io/zh/docs/concepts/services-networking/service/#nodeport) 服务。
+
+   
+
+
+
+## IPVS代理的 Services 概述图
+
+![IPVS代理的 Services 概述图](../images/services-ipvs-overview.svg)
+
+## Service 资源
+
+Kubernetes Service 定义了这样一种抽象：逻辑上的一组 Pod，一种可以访问它们的策略 —— 通常称为微服务。 Service 所针对的 Pods 集合通常是通过[选择算符](https://kubernetes.io/zh/docs/concepts/overview/working-with-objects/labels/)来确定的。
+
+> 选择算符：选择算符允许用户通过标签对一组资源对象进行筛选过滤。
+
+
+
+## 定义 Service
+
+Service 在 Kubernetes 中是一个 REST 对象，和 Pod 类似。 像所有的 REST 对象一样，Service 定义可以基于 `POST` 方式，请求 API server 创建新的实例。 Service 对象的名称必须是合法的 [DNS 标签名称](https://kubernetes.io/zh/docs/concepts/overview/working-with-objects/names#dns-label-names)。
+
+> ### DNS 标签名 
+>
+> 某些资源类型需要其名称遵循 [RFC 1123](https://tools.ietf.org/html/rfc1123) 所定义的 DNS 标签标准。也就是命名必须满足如下规则：
+>
+> - 最多63个字符
+> - 只能包含小写字母、数字，以及'-'
+> - 须以字母数字开头
+> - 须以字母数字结尾s
+
+例如，假定有一组 Pod，它们对外暴露了 9376 端口，同时还被打上 `app=MyApp` 标签：
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: MyApp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
+```
+
+上述配置创建一个名称为 "my-service" 的 Service 对象，它会将请求代理到使用 TCP 端口 9376，并且具有标签 `"app=MyApp"` 的 Pod 上。
+
+Kubernetes 为该服务分配一个 IP 地址（有时称为 "`集群IP`"），该 IP 地址由服务代理使用。 (请参见下面的 [VIP 和 Service 代理](https://kubernetes.io/zh/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies)).
+
+服务选择算符的控制器（The controller for the Service selector）不断扫描与其选择器匹配的 Pod，然后将所有更新发布到也称为 “my-service” 的 Endpoint 对象。
+
+> **说明：** 需要注意的是，Service 能够将一个接收 `port` 映射到任意的 `targetPort`。 默认情况下，`targetPort` 将被设置为与 `port` 字段相同的值。
+
+
+
+
+
 ## 参考资料
 
 - [kubectl 常用命令](https://jingyan.baidu.com/article/d8072ac4087cbdac94cefd5c.html)
