@@ -1227,6 +1227,27 @@ spec:
 
 
 
+必须存在的yaml属性
+
+使用命令可查看：
+
+```bash
+kubectl explain pod
+
+kubectl explain pod.spec
+```
+
+查看Pod中指定容器的日志：
+
+```bash
+kubectl describe pod $podname
+kubectl log $podName -c $containername
+```
+
+
+
+
+
 ## 参考资料
 
 - [kubectl 常用命令](https://jingyan.baidu.com/article/d8072ac4087cbdac94cefd5c.html)
