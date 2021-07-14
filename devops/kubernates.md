@@ -1244,7 +1244,20 @@ kubectl describe pod $podname
 kubectl log $podName -c $containername
 ```
 
+修改pod的配置：
 
+```bash
+kubectl edit pod balanced-bc49b7568-g8n95
+```
+
+
+
+## InitC
+
+Pod可以有一个或多个先于内部应用容器启动的Init容器：
+
+- Init容器总是运行到成功完成为止
+- 每个Init容器都必须在下一个Init容器启动之前成功完成（阻塞式）
 
 
 
