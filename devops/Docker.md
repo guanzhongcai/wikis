@@ -437,8 +437,20 @@ docker-machine ls
 docker-machine ssh swarm-manager
 docker swarm init --advertise-addr 192.168.99.107 #这里的 IP 为创建机器时分配的 ip。
 
+# output
+# docker swarm join --token SWMTKN-1-24chiircvefa75pyya86cq7uy3hrplrbteqcctpnmr221xtk0f-88xty7cs1qmwso3y9lshs4bk8 192.168.65.3:2377
+
 # 增加工作节点node：
 docker swarm join --token SWMTKN-1-4oogo9qziq768dma0uh3j0z0m5twlm10iynvz7ixza96k6jh9p-ajkb6w7qd06y1e33yrgko64sk 192.168.99.107:2377
+
+# 查看节点
+docker node ls
+
+# 生成Manage join tokens
+docker swarm join-token manager
+
+# 输出
+# docker swarm join --token SWMTKN-1-24chiircvefa75pyya86cq7uy3hrplrbteqcctpnmr221xtk0f-a7wl14eo9qwjbm7gbz55kw44d 192.168.65.3:2377
 ```
 
 
