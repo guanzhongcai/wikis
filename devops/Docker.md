@@ -382,6 +382,67 @@ https://n8bn2y81.mirror.aliyuncs.com加到"registry-mirrors"的数组里，点�
 
 
 
+# Docker Machine
+
+Docker Machine 是一种可以让您在虚拟主机上安装 Docker 的工具，并可以使用 docker-machine 命令来管理主机。
+
+Docker Machine 也可以集中管理所有的 docker 主机，比如快速的给 100 台服务器安装上 docker。
+
+```bash
+# 1、列出可用的机器
+docker-machine ls
+
+# 2、创建机器
+docker-machine create --driver virtualbox test
+
+# 3、查看机器的 ip
+docker-machine ip test
+
+# 4、停止机器
+docker-machine stop test
+
+# 5、启动机器
+docker-machine start test
+
+# 6、进入机器
+docker-machine ssh test
+```
+
+
+
+# Swarm 集群管理
+
+Docker Swarm 是 Docker 的集群管理工具。它将 Docker 主机池转变为单个虚拟 Docker 主机。
+
+不同主机间的容器互通，要组织成局域网，需要用到 `docker swarm`，主要用在小型环境中使用。大型用kubernetes。
+
+
+
+swarm 集群由管理节点（manager）和工作节点（work node）构成。
+
+- **swarm mananger**：负责整个集群的管理工作包括集群配置、服务管理等所有跟集群有关的工作。
+- **work node**：即图中的 available node，主要负责运行相应的服务来执行任务（task）。
+
+![img](../images/services-diagram.png)
+
+
+
+```bash
+# 创建 docker 机器：
+docker-machine create -d virtualbox swarm-manager
+
+docker-machine ls
+
+# 初始化 swarm 集群，进行初始化的这台机器，就是集群的管理节点。
+docker-machine ssh swarm-manager
+docker swarm init --advertise-addr 192.168.99.107 #这里的 IP 为创建机器时分配的 ip。
+
+# 增加工作节点node：
+docker swarm join --token SWMTKN-1-4oogo9qziq768dma0uh3j0z0m5twlm10iynvz7ixza96k6jh9p-ajkb6w7qd06y1e33yrgko64sk 192.168.99.107:2377
+```
+
+
+
 ## dockerfile
 
 ![image-20210606220210762](../images/dockerfile.png)
