@@ -1258,6 +1258,15 @@ Pod可以有一个或多个先于内部应用容器启动的Init容器：
 
 - Init容器总是运行到成功完成为止
 - 每个Init容器都必须在下一个Init容器启动之前成功完成（阻塞式）
+- 控制有启动顺序的多个容器间的协助：数据库先起，应用程序之前有个InitC，检查数据库是否work
+
+
+
+```mermaid
+graph LR;
+my-service-->注册coredns
+my-pod-->查找coredns-->得到my-service
+```
 
 
 
