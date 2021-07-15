@@ -453,6 +453,34 @@ docker swarm join-token manager
 # docker swarm join --token SWMTKN-1-24chiircvefa75pyya86cq7uy3hrplrbteqcctpnmr221xtk0f-a7wl14eo9qwjbm7gbz55kw44d 192.168.65.3:2377
 ```
 
+实际命令：
+
+```bash
+# 4节点的nginx服务，集群中任意nodeIP:81都可以访问到这个服务，和容器副本数无关
+docker service create --name my_nginx -p 81:80 --replicas 4 nginx
+
+# 查看container/node分布
+docker service ps my_nginx
+
+# 扩缩容
+docker service update --replicas 2 my_nginx
+```
+
+
+
+# docker stack
+
+```bash
+docker stack deploy -c docker-compose.yml stack-demo
+```
+
+层级关系，由外到内：
+
+1. docker node ls - 节点
+2. docker stack ls - 堆栈
+3. service ls - 服务
+4. docker service ps - task
+
 
 
 ## dockerfile
