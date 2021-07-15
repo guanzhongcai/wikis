@@ -855,6 +855,52 @@ kubectl get pod -n kubernetes-dashboard
 
 
 
+
+
+# Ingress-nginx
+
+[Ingress](https://kubernetes.io/zh/docs/concepts/services-networking/ingress/)是一种 API 对象，其中定义了一些规则使得集群中的 服务可以从集群外访问。 [Ingress 控制器](https://kubernetes.io/zh/docs/concepts/services-networking/ingress-controllers/) 负责满足 Ingress 中所设置的规则。
+
+下面是一个 Ingress 资源的配置文件，负责通过 `hello-world.info` 将服务请求 转发到你的服务。
+
+[`service/networking/example-ingress.yaml`](https://raw.githubusercontent.com/kubernetes/website/main/content/zh/examples/service/networking/example-ingress.yaml)
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - host: hello-world.info
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 8080
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: web2
+                port:
+                  number: 8080
+```
+
+运行下面的命令创建 Ingress 资源:
+
+```bash
+kubectl apply -f https://k8s.io/examples/service/networking/example-ingress.yaml
+```
+
+
+
 # Secret
 
 `Secret` 对象类型用来保存敏感信息，例如密码、OAuth 令牌和 SSH 密钥。 将这些信息放在 `secret` 中比放在 [Pod](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/) 的定义或者 [容器镜像](https://kubernetes.io/zh/docs/reference/glossary/?all=true#term-image) 中来说更加安全和灵活。 参阅 [Secret 设计文档](https://git.k8s.io/community/contributors/design-proposals/auth/secrets.md) 获取更多详细信息。
