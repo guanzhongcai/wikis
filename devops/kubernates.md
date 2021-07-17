@@ -1043,6 +1043,37 @@ https://docs.projectcalico.org
 
 
 
+```bash
+$ kubectl get cs
+Warning: v1 ComponentStatus is deprecated in v1.19+
+NAME                 STATUS      MESSAGE                                                                                       ERROR
+controller-manager   Unhealthy   Get "http://127.0.0.1:10252/healthz": dial tcp 127.0.0.1:10252: connect: connection refused   
+scheduler            Unhealthy   Get "http://127.0.0.1:10251/healthz": dial tcp 127.0.0.1:10251: connect: connection refused   
+etcd-0               Healthy     {"health":"true"} 
+
+$ kubectl cluster-info
+Kubernetes control plane is running at https://127.0.0.1:55936
+CoreDNS is running at https://127.0.0.1:55936/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+```
+
+使用minikube配置nginx实战（参考[hello-minikube项目](https://kubernetes.io/zh/docs/tutorials/hello-minikube/)）：
+
+```bash
+kubectl create deployment hello-nginx --image=nginx --replicas=3
+
+kubectl get deploy
+
+kubectl get pod
+
+kubectl expose deployment hello-nginx --type=LoadBalancer --port=80
+
+minikube service hello-nginx
+```
+
+k8s的scheduler会自动在node间调度，来分配要启动的pod副本数
+
+
+
 # 配置最佳实践
 
 本文档来自于：https://kubernetes.io/zh/docs/concepts/configuration/overview/
