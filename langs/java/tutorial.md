@@ -713,18 +713,18 @@ Java本身是一种设计的非常简单，非常精巧的语言，所以Java背
 
 
 
-## Java VS C#
+## Java VS 其他语言
 
-| 比较项           | .net core       | Java                       | Go             | Nodejs        |
-| ---------------- | --------------- | -------------------------- | -------------- | ------------- |
-| web服务器        | kestral         | Tomcat                     | Gin            | express       |
-| web微服务框架    | ABP Framework   | spring-boot                | go-micro       | featherjs     |
-| 数据库ORM访问    | EntityFramework | spring-boot-jpa            | -              | -             |
-| 数据库基础访问层 | ?               | JDBC                       | sqldriver      | -             |
-| 依赖项配置工具   | nuget           | maven                      | go mod         | npm           |
-| 依赖项配置文件   | ？              | pom.xml                    | go.mod         | package.json  |
-| 可执行文件       | exe             | jar                        | exe            | 动态语言      |
-| 三方库搜索网址   | ?               | https://mvnrepository.com/ | www.github.com | www.npmjs.com |
+| 比较项           | .net core              | Java                       | Go             | NodeJS        |
+| ---------------- | ---------------------- | -------------------------- | -------------- | ------------- |
+| web服务器        | kestral                | Tomcat                     | Gin            | express       |
+| web微服务框架    | ABP Framework          | spring-boot                | go-micro       | featherjs     |
+| 数据库ORM访问    | EntityFramework        | spring-boot-jpa            | -              | -             |
+| 数据库基础访问层 | -                      | JDBC                       | sqldriver      | -             |
+| 依赖项配置工具   | nuget                  | maven                      | go mod         | npm           |
+| 依赖项配置文件   | *.csproj               | pom.xml                    | go.mod         | package.json  |
+| 可执行文件       | exe                    | jar                        | exe            | 动态语言      |
+| 三方库搜索网址   | https://www.nuget.org/ | https://mvnrepository.com/ | www.github.com | www.npmjs.com |
 
 
 
@@ -735,14 +735,6 @@ Java本身是一种设计的非常简单，非常精巧的语言，所以Java背
 - 做现有技术栈的Java翻译
 
 - 打包部署到新机上运行
-
-  |      |      |      |
-  | ---- | ---- | ---- |
-  | 日志 |      |      |
-  |      |      |      |
-  |      |      |      |
-  |      |      |      |
-  |      |      |      |
 
   
 
