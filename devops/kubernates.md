@@ -1102,6 +1102,133 @@ spec:
 
 
 
+### 配置
+
+[k8s官方教程](https://kubernetes.io/zh/docs/tutorials/configuration/configure-java-microservice/configure-java-microservice-interactive/)
+
+```bash
+# 检查pods的状态，并检查它们何时处于就绪状态（才返回）。这是通过向命令提供pod的标签（如inventory）来实现的。发出以下命令以检查微服务的状态：
+kubectl wait --for=condition=ready pod -l app=inventory
+
+# 此命令将名为sys-app-name的ConfigMap部署到集群。它有一个名为name的键，其值为my-system。--from-literal标志允许您指定要存储在此ConfigMap中的各个键值对。其他可用的选项，例如--from-file和--from-env-file，提供了关于如何配置的更多功能。关于这些选项的详细信息可以在这里的Kubernetes CLI文档中找到
+kubectl create configmap sys-app-name --from-literal name=my-system
+
+# 这个命令看起来与创建ConfigMap的命令非常相似，一个区别是generic这个词。这意味着你正在创建一个通用的密码，这意味着它不是一个特殊类型的密码。不同类型的密码，例如存储Docker凭据的秘密和存储公钥/私钥对的密码。
+kubectl create secret generic sys-app-credentials --from-literal username=bob --from-literal password=bobpwd
+```
+
+
+
+kubernetes.yml:
+
+> 请注意valueFrom字段。这指定了环境变量的值，可以从各种源进行设置。源包括ConfigMap、Secret和有关集群的信息。在本例中，configMapKeyRef使用ConfigMap sys-app-name的值设置密钥名称。类似地，secretKeyRef使用Secret sys-app-credentials中的值设置密钥username和password。
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-deployment
+  labels:
+    app: system
+spec:
+  selector:
+    matchLabels:
+      app: system
+  template:
+    metadata:
+      labels:
+        app: system
+    spec:
+      containers:
+      - name: system-container
+        image: system:1.0-SNAPSHOT
+        ports:
+        - containerPort: 9080
+        # Set the APP_NAME environment variable
+        env:
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: sys-app-name
+              key: name
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory-deployment
+  labels:
+    app: inventory
+spec:
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+    spec:
+      containers:
+      - name: inventory-container
+        image: inventory:1.0-SNAPSHOT
+        ports:
+        - containerPort: 9080
+        # Set the SYSTEM_APP_USERNAME and SYSTEM_APP_PASSWORD environment variables
+        env:
+        - name: SYSTEM_APP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: sys-app-credentials
+              key: username
+        - name: SYSTEM_APP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sys-app-credentials
+              key: password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: system-service
+spec:
+  type: NodePort
+  selector:
+    app: system
+  ports:
+  - protocol: TCP
+    port: 9080
+    targetPort: 9080
+    nodePort: 31000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+spec:
+  type: NodePort
+  selector:
+    app: inventory
+  ports:
+  - protocol: TCP
+    port: 9080
+    targetPort: 9080
+    nodePort: 32000
+```
+
+应用修改：
+
+```bash
+kubectl replace --force -f kubernetes.yaml
+kubectl get --watch pods
+```
+
+
+
+### ConfigMap
+
+参见k8s官方教程：[使用 ConfigMap 来配置 Redis](https://kubernetes.io/zh/docs/tutorials/configuration/configure-redis-using-configmap/)
+
+
+
 # 配置最佳实践
 
 本文档来自于：https://kubernetes.io/zh/docs/concepts/configuration/overview/
