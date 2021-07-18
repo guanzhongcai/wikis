@@ -1074,6 +1074,48 @@ k8s的scheduler会自动在node间调度，来分配要启动的pod副本数
 
 
 
+
+
+## 资源配置文件
+
+### deployment & Service
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-app
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.17
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-app
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  type: LoadBalancer
+  selector:
+    name: nginx                    
+```
+
+![ingress-outer-net](k8s/ingress-outer-net.png)
+
+
+
 # 配置最佳实践
 
 本文档来自于：https://kubernetes.io/zh/docs/concepts/configuration/overview/
