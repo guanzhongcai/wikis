@@ -1056,21 +1056,7 @@ Kubernetes control plane is running at https://127.0.0.1:55936
 CoreDNS is running at https://127.0.0.1:55936/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 ```
 
-使用minikube配置nginx实战（参考[hello-minikube项目](https://kubernetes.io/zh/docs/tutorials/hello-minikube/)）：
 
-```bash
-kubectl create deployment hello-nginx --image=nginx --replicas=3
-
-kubectl get deploy
-
-kubectl get pod
-
-kubectl expose deployment hello-nginx --type=LoadBalancer --port=80
-
-minikube service hello-nginx
-```
-
-k8s的scheduler会自动在node间调度，来分配要启动的pod副本数
 
 
 

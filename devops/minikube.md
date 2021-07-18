@@ -27,6 +27,26 @@ minikube dashboard --url
 
 
 
+## hello nginx
+
+使用minikube配置nginx实战（参考[hello-minikube项目](https://kubernetes.io/zh/docs/tutorials/hello-minikube/)）：
+
+```bash
+kubectl create deployment hello-nginx --image=nginx --replicas=3
+
+kubectl get deploy
+
+kubectl get pod
+
+kubectl expose deployment hello-nginx --type=LoadBalancer --port=80
+
+minikube service hello-nginx
+```
+
+k8s的scheduler会自动在node间调度，来分配要启动的pod副本数
+
+
+
 ## 创建 Deployment
 
 Kubernetes [*Pod*](https://kubernetes.io/zh/docs/concepts/workloads/pods/) 是由一个或多个 为了管理和联网而绑定在一起的容器构成的组。 本教程中的 Pod 只有一个容器。 Kubernetes [*Deployment*](https://kubernetes.io/zh/docs/concepts/workloads/controllers/deployment/) 检查 Pod 的健康状况，并在 Pod 中的容器终止的情况下重新启动新的容器。 Deployment 是管理 Pod 创建和扩展的推荐方法。
