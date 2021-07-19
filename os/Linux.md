@@ -235,6 +235,22 @@ shell的中文意思就是贝壳，其实比较类似于我们内核的壳。简
 
 
 
+## bash-completion
+
+[Mac OS X 安裝 bash-completion](https://www.xiexianbin.cn/mac/2019-01-03-mac-git-bash-completion/index.html)
+
+```
+brew install bash-completion
+```
+
+Add bash-completion to your ~/.bash_profile:
+
+```
+[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
+```
+
+
+
 # POSIX解决什么问题
 
 1. [POSIX解决什么问题](https://www.jianshu.com/p/7a17b34e05ee)
