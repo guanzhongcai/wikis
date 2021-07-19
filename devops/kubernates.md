@@ -1229,6 +1229,12 @@ kubectl get --watch pods
 
 
 
+### 有状态应用
+
+[PersistentVolume](https://kubernetes.io/zh/docs/concepts/storage/persistent-volumes/)（PV）是一块集群里由管理员手动提供，或 kubernetes 通过 [StorageClass](https://kubernetes.io/zh/docs/concepts/storage/storage-classes) 动态创建的存储。 [PersistentVolumeClaim](https://kubernetes.io/zh/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims)（PVC）是一个满足对 PV 存储需要的请求。PersistentVolumes 和 PersistentVolumeClaims 是独立于 Pod 生命周期而在 Pod 重启，重新调度甚至删除过程中保存数据。
+
+
+
 # 配置最佳实践
 
 本文档来自于：https://kubernetes.io/zh/docs/concepts/configuration/overview/
