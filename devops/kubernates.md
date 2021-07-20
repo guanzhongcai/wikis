@@ -1254,6 +1254,9 @@ kubectl get --watch pods
 1. Type=ClusterIP 类型 Services 的 Source IP[ ](https://kubernetes.io/zh/docs/tutorials/services/source-ip/#type-clusterip-类型-services-的-source-ip)
 
    ```bash
+   # kubectl create deployment source-ip-app --image=k8s.gcr.io/echoserver:1.4
+   kubectl create deployment source-ip-app --image=registry.aliyuncs.com/google_containers/echoserver:1.4
+   
    kubectl get svc clusterip
    
    kubectl run busybox -it --image=busybox --restart=Never --rm
@@ -1267,13 +1270,79 @@ kubectl get --watch pods
 2. Type=NodePort 类型 Services 的 Source IP[ ](https://kubernetes.io/zh/docs/tutorials/services/source-ip/#type-nodeport-类型-services-的-source-ip)
 
    ```bash
+   # 获取nodePort
+   NODEPORT=$(kubectl get -o jsonpath="{.spec.ports[0].nodePort}" services nodeport)
+   # 获取node IP
+   NODES=$(kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="InternalIP")].address }')
    ```
 
    
 
 
 
+## api-gateway
 
+遵循 OpenAPI规范：https://oai.github.io/Documentation/specification-paths.html
+
+请求对象：
+
+![image-20210720203937044](k8s/open-api.png)
+
+
+
+响应对象：
+
+![image-20210720204130018](k8s/open-api-response.png)
+
+运行OpenAPI的yaml：
+
+```bash
+docker run --rm -p 8800:8080 -v $path/product.v1.yaml:/openapi.yml -e SWAGGER_JSON=/openapi.yml swaggerapi/swagger-ui
+```
+
+`swagger-ui` 网址：https://swagger.io/tools/swagger-ui/
+
+参考教程：[API优先的设计策略、OpenAPI规范与相关工具的使用](https://www.bilibili.com/video/BV16a411A7pt?from=search&seid=16014947834853773602)
+
+
+
+### 工具
+
+Stoplight Studio 是集成OpenAPI的IDE，提供了完全图形化的界面来编辑OpenAPI文档。且包括两个产品：
+
+Spectral：验证OpenAPI文档
+
+Prism：模拟服务器
+
+![image-20210720211217596](k8s/stoplight.png)
+
+OpenAPI使用者的模拟服务器Prism：
+
+```bash
+# 会40010端口监听，-d是根据yaml规范生成随机数据
+prism-cli.exe mock -d product.v1.yaml
+```
+
+Prism: https://stoplight.io/open-source/prism/
+
+
+
+OpenAPITools开发的OpenAPI Generator支持给出多种语言和框架自动生成代码
+
+OpenAPI Generator：https://github.com/openapitools/openapi-generator
+
+```bash
+# 使用下载的OpenAPI Generator CLI的jar包生成java代码
+# 客户端代码
+java -jar .\openapi-generator-cli-5.0.0-beta2.jar generate -i .\product.v1.yaml -g java -o product-java-client
+
+# 服务端代码
+java -jar .\openapi-generator-cli-5.0.0-beta2.jar generate -i .\product.v1.yaml -g spring -o product-java-server
+```
+
+在微服务架构的应用中，API优先来确定API契约：
+
+![image-20210720213657664](k8s/open-api-first.png)
 
 ### k8s.gcr.io镜像拉取
 
