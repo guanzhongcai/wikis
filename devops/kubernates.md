@@ -1235,6 +1235,74 @@ kubectl get --watch pods
 
 
 
+### PV & PVC
+
+> **警告：** 根据存储类和回收策略，删除 *PersistentVolumeClaims* 可能导致关联的卷也被删除。 千万不要认为其容量声明被删除，你就能访问数据。
+
+
+
+### Source IP
+
+- [NAT](https://en.wikipedia.org/wiki/Network_address_translation): 网络地址转换
+- [Source NAT](https://en.wikipedia.org/wiki/Network_address_translation#SNAT): 替换数据包的源 IP, 通常为节点的 IP
+- [Destination NAT](https://en.wikipedia.org/wiki/Network_address_translation#DNAT): 替换数据包的目的 IP, 通常为 Pod 的 IP
+- [VIP](https://kubernetes.io/zh/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies): 一个虚拟 IP, 例如分配给每个 Kubernetes Service 的 IP
+- [Kube-proxy](https://kubernetes.io/zh/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies): 一个网络守护程序，在每个节点上协调 Service VIP 管理
+
+
+
+1. Type=ClusterIP 类型 Services 的 Source IP[ ](https://kubernetes.io/zh/docs/tutorials/services/source-ip/#type-clusterip-类型-services-的-source-ip)
+
+   ```bash
+   kubectl get svc clusterip
+   
+   kubectl run busybox -it --image=busybox --restart=Never --rm
+   
+   wget -qO - 10.0.170.92
+   
+   ```
+
+   无论客户端 pod 和 服务端 pod 是否在相同的节点上，client_address 始终是客户端 pod 的 IP 地址。
+
+2. Type=NodePort 类型 Services 的 Source IP[ ](https://kubernetes.io/zh/docs/tutorials/services/source-ip/#type-nodeport-类型-services-的-source-ip)
+
+   ```bash
+   ```
+
+   
+
+
+
+
+
+### k8s.gcr.io镜像拉取
+
+部署K8S最大的难题是镜像下载，在国内无FQ环境情况下很难从k8s.gcr.io等镜像源里下载镜像。
+
+[这种情况下正确做法是](https://www.cnblogs.com/kevingrace/p/12778066.html)：
+
+**1.** 直接指定国内镜像代理仓库（如阿里云代理仓库）进行镜像拉取下载。
+
+**2.** 成功拉取代理仓库中的镜像后，再将其tag打标签成为k8s.gcr.io对应镜像。
+
+**3.** 最后再删除从代理仓库中拉取下来的镜像。
+
+**4.** 要确保imagePullPolicy策略是IfNotPresent，即本地有镜像则使用本地镜像，不拉取！
+
+  或者将下载的镜像放到harbor私有仓库里，然后将image下载源指向harbor私仓地址。
+
+阿里云代理仓库地址为：**registry.aliyuncs.com/google_containers**
+
+比如下载
+
+**k8s.gcr.io/coredns:1.6.5**
+
+可以代理为：
+
+**registry.aliyuncs.com/google_containers/coredns:1.6.5**
+
+
+
 # 配置最佳实践
 
 本文档来自于：https://kubernetes.io/zh/docs/concepts/configuration/overview/
