@@ -1178,3 +1178,5 @@ logging {
 
 - [P2.Linux服务器项目实训-DNS服务器配置（bind的正向解释和反向解释）](https://www.bilibili.com/video/BV1JK411p7uz?t=1231)
 
+- [tengine.taobao.org - Nginx开发从入门到精通](http://tengine.taobao.org/book/index.html#nginx)
+- [nignx-思维导图笔记](https://processon.com/view/60111292e0b34d1f2ccbb3f4?fromnew=1#outline)
