@@ -1284,6 +1284,12 @@ kubectl get --watch pods
 
 遵循 OpenAPI规范：https://oai.github.io/Documentation/specification-paths.html
 
+ [Kubernetes API 参考](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/) 能够帮助我们找到任何我们想创建的对象的 spec 格式。 例如，可以从 [core/v1 PodSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#podspec-v1-core) 查看 `Pod` 的 `spec` 格式， 并且可以从 [apps/v1 DeploymentSpec](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/#deploymentspec-v1-apps) 查看 `Deployment` 的 `spec` 格式。
+
+
+
+### OpenAPI
+
 请求对象：
 
 ![image-20210720203937044](k8s/open-api.png)
@@ -1660,18 +1666,12 @@ my-pod-->查找coredns-->得到my-service
 ## 参考资料
 
 - [kubectl 常用命令](https://jingyan.baidu.com/article/d8072ac4087cbdac94cefd5c.html)
-
 - [Kubernetes教程(K8s入门到精通)](https://www.bilibili.com/video/BV1w4411y7Go?p=3&spm_id_from=pageDriver)
-
 - [sandbox-百度百科](https://baike.baidu.com/item/Sandbox/9280944?fr=aladdin)
-
 - [centos7虚拟机没有ip地址](https://blog.csdn.net/qq_41622739/article/details/94826266)
-
 - [Kubernetes-kubectl命令出现错误The connection to the server localhost:8080 was refused - did you specif...](https://blog.csdn.net/qq_24046745/article/details/94405188)
-
 - [Kubernetes 包含多个内置工具来帮助你使用 Kubernetes 系统](https://kubernetes.io/zh/docs/reference/tools/)
-
 - [Kube YAML-Validating Kubernetes objects](https://kubeyaml.com/)
-
 - [K8S 容器之间通讯方式](https://www.cnblogs.com/linyouyi/p/11557771.html)
-- 
+- [云原生技术公开课](https://edu.aliyun.com/roadmap/cloudnative?spm=a1z389.11499242.0.0.65452413sISWj4&utm_content=g_1000072542)
+- [](https://edu.aliyun.com/lesson_1651_17052#_17052)
