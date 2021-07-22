@@ -13,13 +13,16 @@ func TestContext(t *testing.T) {
 	defer cancel()
 	go watch(ctx, 1)
 	go watch(ctx, 2)
-	go watch(ctx, 3)
 
 	time.Sleep(2 * time.Second)
-	cancel()
 	t.Log("ctx err is: ", ctx.Err())
 	// sleep 2秒: context canceled
 	// sleep 4秒: context deadline exceeded
+
+	if ctx.Err() == nil {
+		t.Log("活可能干完了，因为没有触发超时，就做完了！")
+		t.Log("也可能没干完，因为超时还没到，没有调用过cancel()，调用过cancel，ctx.Err()会有error信息！")
+	}
 }
 
 func watch(ctx context.Context, id int) {
