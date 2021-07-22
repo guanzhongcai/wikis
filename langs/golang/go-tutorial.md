@@ -772,6 +772,28 @@ func main() {
 
 
 
+#### Context接口
+
+> [Go Context的使用](https://www.jianshu.com/p/ca7f0629de77)
+
+Context是一个接口，具体的内容如下：
+
+```go
+type Context interface {
+    Deadline() (deadline time.Time, ok bool)
+    Done() <-chan struct{}
+    Err() error
+    Value(key interface{}) interface{}
+}
+```
+
+- Deadline方法是获取设置的截止时间的意思，第一个返回式是截止时间，到了这个时间点，Context会自动发起取消请求；第二个返回值ok==false时表示没有设置截止时间，如果需要取消的话，需要调用取消函数进行取消
+- Done方法返回一个只读的chan，类型为struct{}，我们在goroutine中，**如果该方法返回的chan可以读取，则意味着parent context已经发起了取消请求**，我们通过Done方法收到这个信号后，就应该做清理操作，然后退出goroutine，释放资源
+- **Err方法返回取消的错误原因，因为什么Context被取消。**
+- Value方法获取该Context上绑定的值，是一个键值对，所以要通过一个Key才可以获取对应的值，这个值一般是线程安全的
+
+
+
 ### 参考资料
 
 - [GOLANG使用Context管理关联goroutine的方法](https://www.jb51.net/article/154561.htm)
