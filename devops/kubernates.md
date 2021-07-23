@@ -1675,3 +1675,4 @@ my-pod-->查找coredns-->得到my-service
 - [K8S 容器之间通讯方式](https://www.cnblogs.com/linyouyi/p/11557771.html)
 - [云原生技术公开课](https://edu.aliyun.com/roadmap/cloudnative?spm=a1z389.11499242.0.0.65452413sISWj4&utm_content=g_1000072542)
 - [](https://edu.aliyun.com/lesson_1651_17052#_17052)
+
