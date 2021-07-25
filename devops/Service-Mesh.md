@@ -20,7 +20,13 @@
 - A/B测试、灰度发布
 - 限流、访问控制和端到端认证
 
+![image-20210724170051778](service-mesh/key-abilities.png)
 
+
+
+CNCF基石：
+
+![image-20210724170248177](service-mesh/istio-k8s.png)
 
 # Istio的架构
 
@@ -101,3 +107,20 @@ https://github.com/istio/istio
 - Istio的API Server
 - 验证用户编写的Istio API配置
 - 将接管Istio获取配置、处理和分配组件
+
+
+
+# Demo
+
+![image-20210724163727985](service-mesh/bookinfo-sidecar.png)
+
+
+
+```bash
+# 获取Istio对外的访问地址
+kubectl get svr istio-ingressgateway -n istio-system
+
+NAME	TYPE	CLUSTER-IP	EXTERNAL-IP	PORTS
+xxx		LoadBalancer	172.21.12.220	39.97.6.167	15020:31803/TCP
+```
+
