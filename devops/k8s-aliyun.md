@@ -92,6 +92,15 @@ annotation:
 kubectl annotate pods nginx1 my-annotate='my comment, ok'
 ```
 
+更新镜像：
+
+```bash
+kubectl set image deployment.v1.apps/nginx-deployment nginx=nginx:1.9.1
+
+# 查看历史
+kubectl rollout history deployment.apps/source-ip-app
+```
+
 
 
 
