@@ -30,3 +30,11 @@ minikube start --vm-driver virtualbox
 
 - kubernetes就是云时代的操作系统！
 - 以此类推，容器镜像其实就是：这个操作系统的软件安装包
+
+
+
+## 容器
+
+- 资源视图隔离 - Namespace
+- 控制资源使用率 - CGroup
+- 独立的文件系统 - chroot：在*nix下，chroot这个系统调用，可以把一个子目录变为根目录，在视图级别进行隔离。
