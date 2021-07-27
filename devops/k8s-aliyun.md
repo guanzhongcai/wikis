@@ -103,6 +103,34 @@ kubectl rollout history deployment.apps/source-ip-app
 
 
 
+查看DaemonSet回滚更新状态：
+
+```bash
+kubectl rollout status ds/fluentd-elasticsearch
+```
+
+
+
+## ConfigMap
+
+创建命令：
+
+```bash
+kubectl create configmap [name] [data]
+```
+
+指定文件：
+
+```bash
+kubectl create configmap kube-flannel-cfg --from-file=configure-pod-container/configmap/cni-conf.json -n kube-system
+```
+
+指定键值对：
+
+```bash
+kubectl create configmap special-config --from-literal=special.how=very --from-literal=special.type=charm
+```
+
 
 
 
