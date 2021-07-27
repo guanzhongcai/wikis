@@ -93,6 +93,35 @@ func newCancelCtx(parent Context) cancelCtx {
 	return cancelCtx{Context: parent}
 }
 
+// propagateCancel 安排child取消，当parent是取消
+func propagateCancel(parent Context, child canceler) {
+	if parent.Done() == nil {
+		return // parent从不取消
+	}
+	if p, ok := parentCancelCtx(parent); ok {
+		p.mu.Lock()
+		if p.err != nil {
+			// parent已经被取消
+			child.cancel(false, p.err)
+		} else {
+			if p.children == nil {
+				p.children = make(map[canceler]struct{})
+			}
+			p.children[child] = struct{}{}
+		}
+		p.mu.Unlock()
+	} else {
+		go func() {
+			select {
+			case <-parent.Done():
+				child.cancel(false, parent.Err())
+			case <-child.Done():
+				// nothing
+			}
+		}()
+	}
+}
+
 type canceler interface {
 	cancel(removeFromParent bool, err error)
 	Done() <-chan struct{}
@@ -172,6 +201,45 @@ func (c *cancelCtx) cancel(removeFromParent bool, err error) {
 	}
 }
 
+// WithDeadline 返回一个parent的copy，带上了调整后不迟于d的参数
+// 如果parent的deadline已经早于d，WithDeadline(parent, d)是和parent的语义是等同的
+// 返回的context是Done channel是关闭的：
+// 1.如果deadline过期了
+// 2.如果返回的cancel函数被调用
+// 3.parent context的Done channel被关闭
+//
+// 取消这个context会释放和它有关的资源，同上
+func WithDeadline(parent Context, d time.Time) (Context, CancelFunc) {
+	if cur, ok := parent.Deadline(); ok && cur.Before(d) {
+		// 当前的deadline已经快于新的
+		return WithCancel(parent)
+	}
+
+	c := &timerCtx{
+		cancelCtx: newCancelCtx(parent),
+		deadline:  d,
+	}
+	propagateCancel(parent, c)
+	dur := time.Until(d)
+	if dur <= 0 {
+		// deadline已经过去了
+		c.cancel(true, DeadlineExceeded)
+		return c, func() {
+			c.cancel(false, Canceled)
+		}
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.err == nil {
+		c.timer = time.AfterFunc(dur, func() {
+			c.cancel(true, DeadlineExceeded)
+		})
+	}
+	return c, func() {
+		c.cancel(true, Canceled)
+	}
+}
+
 // parentCancelCtx 查找parent链的引用，条件：*chancelCtx.
 // 此函数知道此包的每个实体类型代表的parent
 func parentCancelCtx(parent Context) (*cancelCtx, bool) {
@@ -205,8 +273,39 @@ func removeChild(parent Context, child canceler) {
 
 type timerCtx struct {
 	cancelCtx
-	time     *time.Timer // under cancelCtx.mu
+	timer    *time.Timer // under cancelCtx.mu
 	deadline time.Time
+}
+
+func (c *timerCtx) Deadline() (deadline time.Time, ok bool) {
+	return c.deadline, true
+}
+
+func (c *timerCtx) cancel(removeFromParent bool, err error) {
+	c.cancelCtx.cancel(false, err)
+	if removeFromParent {
+		// 从它的parent的cancelCtx's的children中移除这个timerCtx
+		removeChild(c.cancelCtx.Context, c)
+	}
+	c.mu.Lock()
+	if c.timer != nil {
+		c.timer.Stop()
+		c.timer = nil
+	}
+	c.mu.Unlock()
+}
+
+// WithTimeout 返回WithDeadline的实现
+func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc) {
+	return WithDeadline(parent, time.Now().Add(timeout))
+}
+
+func WithValue(parent Context, key, val interface{}) Context {
+	if key == nil {
+		panic("nil key")
+	}
+	// todo: key is not comparable
+	return &valueCtx{parent, key, val}
 }
 
 type valueCtx struct {
@@ -214,31 +313,25 @@ type valueCtx struct {
 	key, val interface{}
 }
 
-// propagateCancel 安排child取消，当parent是取消
-func propagateCancel(parent Context, child canceler) {
-	if parent.Done() == nil {
-		return // parent从不取消
+// stringify 没有使用fmt包，因为不想context依赖unicode表
+func stringify(v interface{}) string {
+	switch s := v.(type) {
+	case stringer:
+		return s.String()
+	case string:
+		return s
 	}
-	if p, ok := parentCancelCtx(parent); ok {
-		p.mu.Lock()
-		if p.err != nil {
-			// parent已经被取消
-			child.cancel(false, p.err)
-		} else {
-			if p.children == nil {
-				p.children = make(map[canceler]struct{})
-			}
-			p.children[child] = struct{}{}
-		}
-		p.mu.Unlock()
-	} else {
-		go func() {
-			select {
-			case <- parent.Done():
-				child.cancel(false, parent.Err())
-			case <-child.Done():
-				// nothing
-			}
-		}()
+	return "not <Stringer>"
+}
+
+func (c *valueCtx) String() string {
+	return contextName(c.Context) + ".WithValue(type " +
+		stringify(c.key) + ", val " + stringify(c.val) + ")"
+}
+
+func (c *valueCtx) Value(key interface{}) interface{} {
+	if c.key == key {
+		return c.val
 	}
+	return c.Context.Value(key)
 }
