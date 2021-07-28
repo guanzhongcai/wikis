@@ -133,6 +133,13 @@ kubectl create configmap special-config --from-literal=special.how=very --from-l
 
 
 
+Kubernetes 是允许管理员在命名空间中指定资源 Request 和 Limit 的，这一特性对于资源管理限制非常有用：**如果管理员在命名空间中设置了 CPU** **Request 配额，那么所有 Pod 也要在其定义中设置 CPU** **Request，否则就无法被调配资源**。
+
+- **尊敬的开发人员，请在你的工作负载中设置 Request 和 Limit；**
+- **尊敬的集群管理员，设置命名空间配额会强制命名空间中的所有工作负载的容器中使用该 Request 和 Limit。**
+
+
+
 
 
 ## 参考资料

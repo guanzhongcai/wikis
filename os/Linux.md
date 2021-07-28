@@ -275,6 +275,40 @@ Add bash-completion to your ~/.bash_profile:
 
 
 
+# 命名空间
+
+Docker核心解决的问题是利用LXC来实现类似VM的功能，从而利用更加节省的硬件资源提供给用户更多的计算资源。而 LXC所实现的隔离性主要是来自内核的命名空间, 其中pid、net、ipc、mnt、uts 等命名空间将容器的进程、网络、消息、文件系统和hostname 隔离开。
+
+[Linux中的clone()函数](https://www.cnblogs.com/xianzhedeyu/archive/2013/06/11/3132146.html)
+
+```c
+int clone(int (*fn)(void *), void *child_stack, int flags, void *arg);
+```
+
+这里fn是函数指针，我们知道进程的4要素，这个就是指向程序的指针，就是所谓的“剧本", child_stack明显是为子进程分配系统堆栈空间（在linux下系统堆栈空间是2页面，就是8K的内存，其中在这块内存中，低地址上放入了值，这个值就是进程控制块task_struct的值）,flags就是标志用来描述你需要从父进程继承那些资源， arg就是传给子进程的参数
+
+flags取值：
+
+ `CLONE_PARENT` 创建的子进程的父进程是调用者的父进程，新进程与创建它的进程成了“兄弟”而不是“父子”
+
+ `CLONE_FS`     子进程与父进程共享相同的文件系统，包括root、当前目录、umask
+
+ `CLONE_FILES`   子进程与父进程共享相同的文件描述符（file descriptor）表
+
+ `CLONE_NEWNS` 在新的namespace启动子进程，namespace描述了进程的文件hierarchy
+
+ `CLONE_SIGHAND` 子进程与父进程共享相同的信号处理（signal handler）表
+
+ `CLONE_PTRACE` 若父进程被trace，子进程也被trace
+
+ `CLONE_VFORK`  父进程被挂起，直至子进程释放虚拟内存资源
+
+ `CLONE_VM`     子进程与父进程运行于相同的内存空间
+
+ `CLONE_PID`     子进程在创建时PID与父进程一致
+
+ `CLONE_THREAD`  Linux 2.4中增加以支持POSIX线程标准，子进程与父进程共享相同的线程群
+
 ## 参考资料
 
 - [iptables入门指南 --- iptables详解 ---iptbales 防火墙](https://www.cnblogs.com/liang2580/articles/8400140.html)
