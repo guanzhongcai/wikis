@@ -40,6 +40,7 @@ kubectl get pod
 
 kubectl expose deployment hello-nginx --type=LoadBalancer --port=80
 
+kubectl expose deploymet hello-nginx --type=NodePort --port=80 --target-port=80
 minikube service hello-nginx
 ```
 
