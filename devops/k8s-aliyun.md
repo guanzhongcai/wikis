@@ -140,6 +140,16 @@ Kubernetes 是允许管理员在命名空间中指定资源 Request 和 Limit �
 
 
 
+## Namespace
+
+使用`unshare`实现资源隔离的。
+
+```bash
+man unshare
+
+sudo unshare --mount-proc --pid --fork /bin/bash
+```
+
 
 
 ## 参考资料

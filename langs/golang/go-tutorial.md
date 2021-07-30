@@ -2270,3 +2270,5 @@ swagger serve -F=swagger swagger.json
 - [深度解密Go语言之context](https://www.cnblogs.com/qcrao-2018/p/11007503.html)
 
 - [MSB-Go语言内存管理](https://www.bilibili.com/video/BV1S5411P7ky?p=4&spm_id_from=pageDriver)
+
+- [Go标准库：Go template用法详解](https://www.cnblogs.com/f-ck-need-u/p/10053124.html)
