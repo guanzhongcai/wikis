@@ -1,0 +1,18 @@
+# Dynamic Volume Provisioning
+
+### 系统管理员创建 ###
+# StorageClass 就像动态创建PV的模板，为创建PV对象提供必要的参数
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: csi-disk
+# 指定使用什么Volume plugin来create/delete/attach/detach/mount/unmount新PV
+# 该Volume plugi需要部署到k8s cluster中
+provisioner: diskplugin.csi.alibabacloud.com
+parameters:
+  regionId: cn-Beijing
+  zongId: cn-beiing-b
+  fsType: ext4
+  type: cloud_ssd
+reclaimPolicy: Delete    
