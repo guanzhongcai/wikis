@@ -152,9 +152,32 @@ sudo unshare --mount-proc --pid --fork /bin/bash
 
 
 
+- csi: continuous storege interface
+- `findmnt`: 可以查找已经mount的目录信息
+
+- shim 的职责就是作为 Adapter 将各种容器运行时本身的接口适配到 Kubernetes 的 CRI 接口上。
+
+
+
+## 存储快照
+
+要解决的问题：
+
+- 数据误操作之后的how to快速恢复？
+- 快速进行复制，迁移重要数据？how to进行环境复制与数据开发？
+
+解决办法：
+
+kubernetes CSI Snapshotter controller ！
+
+
+
 ## 参考资料
 
 - [Linux命名空间入门（一） UTS命名空间](https://blog.csdn.net/weifenghai/article/details/52836109)
 
 - [【笔记】《CNCF × Alibaba云原生技术公开课》知识点](https://www.cnblogs.com/fudonghai/p/10851076.html)
-- 
+- [K8S Runtime CRI OCI contained dockershim 理解](https://blog.csdn.net/u011563903/article/details/90743853)
+
+- [CRI 与 ShimV2：一种 Kubernetes 集成容器运行时的新思路](https://developer.aliyun.com/article/679993)
+
