@@ -446,6 +446,42 @@ VFS 在用户和文件系统之间提供了一个交换层
 
 
 
+blkio -- 这个子系统为块设备设定输入/输出限制，比如物理设备（磁盘，固态硬盘，USB 等等）。
+
+cpu -- 这个子系统使用调度程序提供对 CPU 的 cgroup 任务访问。
+
+cpuacct -- 这个子系统自动生成 cgroup 中任务所使用的 CPU 报告。
+
+cpuset -- 这个子系统为 cgroup 中的任务分配独立 CPU（在多核系统）和内存节点。
+
+devices -- 这个子系统可允许或者拒绝 cgroup 中的任务访问设备。
+
+freezer -- 这个子系统挂起或者恢复 cgroup 中的任务。
+
+memory -- 这个子系统设定 cgroup 中任务使用的内存限制，并自动生成由那些任务使用的内存资源报告。
+
+net_cls -- 这个子系统使用等级识别符（classid）标记网络数据包，可允许 Linux 流量控制程序（tc）识别从具体 cgroup 中生成的数据包。
+
+ns -- 名称空间子系统。
+
+
+
+# Linux Container
+
+[Linux Containers](https://linuxcontainers.org/) (LXC) 是一种操作系统级别的虚拟化方法，用于在单个控制主机（LXC 主机）上运行多个隔离的 Linux 系统（容器）。它不提供虚拟机，而是提供一个拥有自己的CPU、内存、块I/O、网络等空间和资源控制机制的虚拟环境。这是由LXC 主机上的 Linux 内核中的[命名空间](https://en.wikipedia.org/wiki/Linux_namespaces)和[cgroups](https://wiki.archlinux.org/title/Cgroups)功能提供的。它类似于 chroot，但提供了更多的隔离。
+
+使用容器的替代方案是[systemd-nspawn](https://wiki.archlinux.org/title/Systemd-nspawn)或[Docker](https://wiki.archlinux.org/title/Docker)。
+
+摘自：
+
+- https://wiki.archlinux.org/title/Linux_Containers
+
+- https://linuxcontainers.org/
+
+
+
+
+
 ## 参考资料
 
 - [iptables入门指南 --- iptables详解 ---iptbales 防火墙](https://www.cnblogs.com/liang2580/articles/8400140.html)
