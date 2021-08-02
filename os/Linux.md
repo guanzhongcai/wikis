@@ -309,6 +309,109 @@ flags取值：
 
  `CLONE_THREAD`  Linux 2.4中增加以支持POSIX线程标准，子进程与父进程共享相同的线程群
 
+
+
+# OS
+
+## rootfs
+
+**rootfs根文件系统首先是内核启动时所mount的第一个文件系统，内核代码映像文件保存在根文件系统中，而系统引导启动程序会在根文件系统挂载之后从中把一些基本的初始化脚本和服务等加载到内存中去运行。（**[百度百科](https://baike.baidu.com/item/%E6%A0%B9%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/8029044?fr=aladdin)）
+
+**尽管内核是 Linux 的核心，但`文件`却是用户与操作系统交互所采用的主要工具。**
+
+Linux根文件系统中一般有如下的几个目录：
+
+- /bin目录
+
+  **该目录下的命令可以被root与一般账号所使用**，如命令：cat、chgrp、chmod、cp、ls、sh、kill、mount、umount、mkdir、[、test
+
+- /sbin目录
+
+  **存放只有系统管理员（俗称最高权限的root）能够使用的命令**，/sbin目录中存放的是基本的系统命令，它们用于启动系统和修复系统等，如命令：shutdown、reboot、fdisk、fsck、init等
+
+- /dev目录
+
+  **该目录下存放的是设备与设备接口的文件**，Linux系统下，以文件的方式访问各种设备，即通过读写某个设备文件操作某个具体硬件。比较重要的文件有/dev/null, /dev/zero, /dev/tty, /dev/lp*等。
+
+- /etc目录
+
+  **该目录下存放着系统主要的配置文件**，例如人员的账号密码文件、各种服务的配置文件等。
+
+- /lib目录
+
+  **该目录下存放共享库和可加载（[驱动程序](https://baike.baidu.com/item/驱动程序)），共享库用于启动系统。**运行根文件系统中的可执行程序，比如：/bin /sbin 目录下的程序。
+
+- /home目录
+
+  **系统默认的用户文件夹**，它是可选的，对于每个普通用户，在/home目录下都有一个以用户名命名的子目录，**里面存放用户相关的配置文件。**
+
+- /root目录：
+
+  **系统管理员（root）的主文件夹，即是根用户的目录**，与此对应，普通用户的目录是/home下的某个子目录。
+
+- /usr目录
+
+  /usr目录的内容可以存在另一个分区中，在系统启动后再挂接到根文件系统中的/usr目录下。里面存放的是共享、只读的程序和数据，这表明/usr目录下的内容可以在多个主机间共享，这些主要也符合[FHS](https://baike.baidu.com/item/FHS)标准的。**/usr中的文件应该是只读的，其他主机相关的，可变的文件应该保存在其他目录下，比如/var。**
+
+- /var目录
+
+  与/usr目录相反，**/var目录中存放可变的数据**，比如spool目录（mail,news），[log文件](https://baike.baidu.com/item/log文件/6646002)，临时文件。
+
+- /proc目录
+
+  这是一个空目录，常作为proc文件系统的挂接点，proc文件系统是个虚拟的文件系统，它没有实际的存储设备，里面的目录，**文件都是由内核临时生成的，用来表示系统的运行状态**，也可以操作其中的文件控制系统。
+
+- /mnt目录
+
+  用于临时挂载某个文件系统的挂接点，通常是空目录，也可以在里面创建一些空的子目录，比如/mnt/cdram /mnt/hda1 。**用来临时挂载光盘、移动存储设备等。**
+
+- /tmp目录：
+
+  用于存放临时文件，通常是空目录，一些需要生成临时文件的程序用到的/tmp目录下，**所以/tmp目录必须存在并可以访问**。
+
+
+
+## chroot
+
+CHROOT就是Change Root，也就是改变程序执行时所参考的根目录位置。CHROOT可以增进系统的安全性，限制使用者能做的事。
+
+**作用**
+
+1.限制被CHROOT的使用者所能执行的程式，如SetUid的程式，或是会造成 Load 的Compiler等等。
+
+2.防止使用者存取某些特定档案，如/etc/passwd。
+
+3.防止入侵者/bin/rm -rf /。
+
+4.提供Guest服务以及处罚不乖的使用者。
+
+5.增进系统的安全。
+
+
+
+## Cgroup
+
+**cgroups**，其名称源自**控制组群**（control groups）的简写，是[Linux内核](https://baike.baidu.com/item/Linux内核/10142820)的一个功能，用来限制、控制与分离一个[进程组](https://baike.baidu.com/item/进程组/1910809)的[资源](https://baike.baidu.com/item/资源)（如[CPU](https://baike.baidu.com/item/CPU/120556)、[内存](https://baike.baidu.com/item/内存/103614)、[磁盘](https://baike.baidu.com/item/磁盘/2842227)输入输出等）。
+
+
+
+cgroups的一个设计目标是为不同的应用情况提供统一的接口，从控制单一进程（像[nice](https://baike.baidu.com/item/nice)）到[操作系统层虚拟化](https://baike.baidu.com/item/操作系统层虚拟化)（像[OpenVZ](https://baike.baidu.com/item/OpenVZ)，Linux-VServer，[LXC](https://baike.baidu.com/item/LXC)）。cgroups提供：
+
+- **资源限制：**组可以被设置不超过设定的[内存](https://baike.baidu.com/item/内存)限制；这也包括[虚拟内存](https://baike.baidu.com/item/虚拟内存)。
+- **优先级：**一些组可能会得到大量的CPU或磁盘IO吞吐量。
+- **结算：**用来衡量系统确实把多少资源用到适合的目的上。
+- **控制：**冻结组或检查点和重启动。
+
+
+
+## Linux内核
+
+Linux内核的主要模块（或组件）分以下几个部分：存储管理、CPU和[进程管理](https://baike.baidu.com/item/进程管理)、文件系统、设备管理和驱动、网络通信，以及系统的初始化（引导）、系统调用等。
+
+
+
+
+
 ## 参考资料
 
 - [iptables入门指南 --- iptables详解 ---iptbales 防火墙](https://www.cnblogs.com/liang2580/articles/8400140.html)
