@@ -2,16 +2,7 @@
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Spring" name="Spring">
-      <configuration>
-        <fileset id="fileset" name="Spring Application Context" removed="false">
-          <file>file://$MODULE_DIR$/src/main/resources/beams.xml</file>
-          <file>file://$MODULE_DIR$/src/main/resources/beans2.xml</file>
-        </fileset>
-        <fileset id="fileset2" name="Beans3" removed="false">
-          <dependency>fileset</dependency>
-          <file>file://$MODULE_DIR$/src/main/resources/beans3.xml</file>
-        </fileset>
-      </configuration>
+      <configuration />
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
