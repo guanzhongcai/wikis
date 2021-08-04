@@ -178,6 +178,25 @@ PV在Binding或者Dynamic Provisioning时，并不知道使用它的Pod会被调
 
 
 
+## 可观测性
+
+- liveness probe 保活探针，探测到不活了就移除此pod
+- readiness probe 就绪指针，探测到就绪了就可以分配流量对外提供服务
+
+开源的调试工具
+
+kubectl-debug
+
+```bash
+kubectl debug demo-pod
+```
+
+
+
+
+
+
+
 ## 参考资料
 
 - [Linux命名空间入门（一） UTS命名空间](https://blog.csdn.net/weifenghai/article/details/52836109)

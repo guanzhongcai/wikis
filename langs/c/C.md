@@ -184,6 +184,16 @@ int execvp(const char * file，char * const argv[])；
 
 ## fcntl
 
+在多数`unix`系统中，当多个进程/线程同时编辑一个文件时，该文件的最后状态取决于最后一个写该文件的进程。
+
+文件锁（也叫记录锁）的作用是，当一个进程读写文件的某部分时，其他进程就无法修改同一文件区域。
+
+能够实现文件锁的函数主要有2个：`flock`和`fcntl`。
+
+> [文件锁的使用浅析](https://blog.csdn.net/guotianqing/article/details/80044087)
+
+
+
 通过fcntl可以改变已打开的文件性质。
 
 ```c
