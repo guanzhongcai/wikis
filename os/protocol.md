@@ -1,3 +1,5 @@
+
+
 # Thrift
 
 用于可扩展的跨语言服务开发的Apache Thrift软件框架将软件堆栈与代码生成引擎结合在一起，是一个跨语言的轻量级RPC消息和数据交换框架，Thrift能生成的语言有: C++, Java, Python, PHP, Ruby, Erlang, Perl, Haskell, C#, Cocoa, Smalltalk, and OCaml。
