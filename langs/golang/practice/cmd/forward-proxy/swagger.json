@@ -1,0 +1,39 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/api/v1/addr/update/{id}": {
+      "put": {
+        "description": "修改指定用户的addr",
+        "tags": [
+          "addr"
+        ],
+        "summary": "修改用户地址",
+        "operationId": "del",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "token",
+            "name": "token",
+            "in": "header",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "地址id",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "addr",
+            "name": "addr",
+            "in": "body",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    }
+  }
+}
