@@ -105,6 +105,24 @@ Cache-Control 是 **http1.1** 时出现的 header 信息，主要是利用该字
 
 
 
+## SessionStorage
+
+localStorage 和 sessionStorage 属性允许在浏览器中存储 key/value 对的数据。
+
+sessionStorage 用于临时保存同一窗口(或标签页)的数据，在关闭窗口或标签页之后将会删除这些数据。
+
+**提示:** 如果你想在浏览器窗口关闭后还保留数据，可以使用 [localStorage](https://www.runoob.com/jsref/prop-win-localstorage.html) 属性， 该数据对象没有过期时间，今天、下周、明年都能用，除非你手动去删除。
+
+
+
+解决a标签打开新页面sessionStorage丢失：
+
+```html
+<a target="_blank" href="www.XXXXX.com" rel="opener"></a>
+```
+
+
+
 ## 跨域
 
 跨域概念：指的是浏览器不能执行其他网站的脚本。它是由浏览器的同源策略造成的，是浏览器对javascript施加的安全限制。
