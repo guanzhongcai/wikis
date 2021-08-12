@@ -6,3 +6,5 @@ langs/golang/go-concurrency-book/cmd/forward-proxy/forward-proxy
 langs/golang/go-concurrency-book/cmd/reverse-proxy/reverse-proxy
 langs/golang/go-concurrency-book/.idea/
 langs/golang/tutorial/go_learning/.idea/
+langs/golang/practice/cmd/go-template/go-template
+langs/golang/practice/cmd/log-process/log-process

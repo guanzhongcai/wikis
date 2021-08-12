@@ -126,6 +126,44 @@ tcpdump 对截获的数据并没有进行彻底解码，数据包内的大部分
 
 
 
+## inode
+
+[inode](https://baike.baidu.com/item/inode/16194#viewPageContent) 用来存放档案及目录的基本信息，包含时间、档名、使用者及群组等。
+
+*inode* 是 UNIX 操作系统中的一种数据结构，其本质是[结构体](https://baike.baidu.com/item/结构体)，它包含了与文件系统中各个文件相关的一些重要信息。在 UNIX 中创建文件系统时，同时将会创建大量的 inode 。通常，文件系统磁盘空间中大约百分之一空间分配给了 inode 表。
+
+inode 表包含一份清单，其中列出了对应文件系统的所有 inode 编号。当用户搜索或者访问一个文件时，UNIX 系统通过 inode 表查找正确的 inode 编号。在找到 inode 编号之后，相关的命令才可以访问该 inode ，并对其进行适当的更改。
+
+例如，使用 vi 来编辑一个文件。当您键入 vi 时，在 inode 表中找到 inode 编号之后，才允许您打开该 inode 。在 vi 的编辑会话期间，更改了该 inode 中的某些属性，当您完成操作并键入 :wq 时，将关闭并释放该 inode 。
+
+
+
+inode 中所包含的、UNIX 用户经常使用的一些重要信息：
+
+● inode 编号
+
+● 用来识别文件类型，以及用于 stat C 函数的模式信息
+
+● 文件的链接数目
+
+● 属主的ID (UID)
+
+● 属主的组 ID (GID)
+
+● 文件的大小
+
+● 文件所使用的磁盘块的实际数目
+
+● 最近一次修改的时间
+
+● 最近一次访问的时间
+
+● 最近一次更改的时间
+
+从根本上讲， inode 中包含有关文件的所有信息（除了文件的实际名称以及实际数据内容之外）。
+
+
+
 ## iptables
 
 - iptables是Linux [内核](https://baike.baidu.com/item/内核/108410)集成的 IP 信息包过滤系统，有利于在 Linux 系统上更好地控制 IP 信息包过滤和[防火墙](https://baike.baidu.com/item/防火墙/52767)配置。
