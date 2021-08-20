@@ -193,7 +193,13 @@ kubectl debug demo-pod
 
 
 
+## 开发实践
 
+- 一个nginx前端，一个go的后端API，实现user的增删改查
+- redis数据库
+- 机密信息存ConfigMap
+- 有Ingress
+- 高可用，多副本
 
 
 

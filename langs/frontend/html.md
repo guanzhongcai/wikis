@@ -108,3 +108,13 @@ World Wide Web Consortium 万维网联盟，W3C标准包括：
 <a href="https://blog.kuangstudy.com" target="hello">点击跳转</a>
 ```
 
+
+
+## Document 对象
+
+[每个载入浏览器的 `HTML` 文档都会成为 `Document` 对象](https://www.w3school.com.cn/jsref/dom_obj_document.asp)。
+
+Document 对象使我们可以从脚本中对 HTML 页面中的所有元素进行访问。
+
+**提示：**Document 对象是 Window 对象的一部分，可通过 `window.document` 属性对其进行访问。
+
