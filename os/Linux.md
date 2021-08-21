@@ -2,6 +2,14 @@
 
 
 
+## tty
+
+TTY是电传打字机`Teletypewriter`的缩写，TTY是最流行的终端设备。
+
+终端（terminal）=tty=文本的输入输出环境
+
+
+
 ## Linux中rz和sz命令用法详解
 
 `rz，sz`是Linux/Unix同Windows进行ZModem文件传输的命令行工具。优点就是不用再开一个sftp工具登录上去上传下载文件。
@@ -515,6 +523,10 @@ ns -- 名称空间子系统。
 - https://wiki.archlinux.org/title/Linux_Containers
 
 - https://linuxcontainers.org/
+
+
+
+
 
 
 
