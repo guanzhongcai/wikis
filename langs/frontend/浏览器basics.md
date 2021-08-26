@@ -137,6 +137,14 @@ sessionStorage 用于临时保存同一窗口(或标签页)的数据，在关闭
 
 
 
+## document
+
+浏览器的html文档成为document对象，document对象是window对象的一部分。在一个浏览器窗口中可能有多个document，例如通过iframe加载的页面，每一个都是一个document。
+
+
+
+
+
 ### 参考资料
 
 - [[浏览器缓存机制](https://segmentfault.com/a/1190000017962411)](https://segmentfault.com/a/1190000017962411)

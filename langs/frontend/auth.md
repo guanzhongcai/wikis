@@ -113,3 +113,4 @@ OIDC使用OAuth2.0的授权服务器来为第三方用户提供身份认证，�
 
 - [The OAuth 2.0 Authorization Framework](https://datatracker.ietf.org/doc/html/rfc6749)
 
+- [OAuth 2.0 Playground](https://www.oauth.com/playground/)
