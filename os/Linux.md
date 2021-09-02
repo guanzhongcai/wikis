@@ -528,6 +528,61 @@ ns -- 名称空间子系统。
 
 
 
+# rsync
+
+rsync是[linux系统](https://baike.baidu.com/item/linux系统/1732935)下的数据镜像备份工具。使用快速增量备份工具Remote Sync可以远程同步，支持本地复制，或者与其他SSH、rsync主机同步。
+
+目前，已支持跨平台，可以在Windows与Linux间进行数据同步。
+
+https://baike.baidu.com/item/rsync/8086338?fr=aladdin
+
+快速：第一次同步时 rsync 会复制全部内容，但在下一次只传输修改过的文件。rsync 在传输数据的过程中可以实行压缩及[解压缩](https://baike.baidu.com/item/解压缩)操作，因此可以使用更少的带宽。
+
+
+
+## 服务器端启动
+
+```bash
+usr/bin/rsync --daemon --config=/etc/rsyncd/rsyncd.conf
+```
+
+也可以在/etc/rc.d/rc.local里加入让系统自动启动等.
+
+
+
+## 客户端同步
+
+```bash
+# rsync -参数 用户名@同步服务器的IP::rsyncd.conf中那个方括号里的内容 本地存放路径
+rsync -avzP nemo@192.168.10.1::nemo /backup
+```
+
+说明：
+
+-a 参数，相当于-rlptgoD，-r 是递归 -l 是链接文件，意思是拷贝链接文件；-p 表示保持文件原有权限；-t 保持文件原有时间；-g 保持文件原有用户组；-o 保持文件原有属主；-D 相当于[块设备](https://baike.baidu.com/item/块设备)文件；
+
+-z 传输时压缩；
+
+-P 传输进度；
+
+-v 传输时的进度等信息；
+
+
+
+## 安装
+
+Ubuntu安装: 
+
+```bash
+sudo apt-get install rsync
+```
+
+RedHat: 
+
+```bash
+yum install rsync
+```
+
 
 
 ## 参考资料
