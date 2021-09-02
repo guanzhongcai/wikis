@@ -540,6 +540,10 @@ https://baike.baidu.com/item/rsync/8086338?fr=aladdin
 
 
 
+**默认规则是文件大小或修改时间有变动**
+
+
+
 ## 服务器端启动
 
 ```bash
@@ -582,6 +586,30 @@ RedHat:
 ```bash
 yum install rsync
 ```
+
+
+
+## rsync 协议
+
+除了使用 SSH，如果另一台服务器安装并运行了 **rsync** 守护程序，则也可以用`rsync://`协议（默认端口873）进行传输。具体写法是服务器与目标目录之间使用双冒号分隔`::`。
+
+> ```bash
+> $ rsync -av source/ 192.168.122.32::module/destination
+> ```
+
+注意，上面地址中的`module`并不是实际路径名，而是 **rsync** 守护程序指定的一个资源名，由管理员分配。
+
+如果想知道 **rsync** 守护程序分配的所有 module 列表，可以执行下面命令。
+
+> ```bash
+> $ rsync rsync://192.168.122.32
+> ```
+
+**rsync** 协议除了使用双冒号，也可以直接用`rsync://`协议指定地址。
+
+> ```bash
+> $ rsync -av source/ rsync://192.168.122.32/module/destination
+> ```
 
 
 
