@@ -45,6 +45,24 @@ char * name2 = name1; //不可以，因为name2 和 name1存放的是同一块�
 
 
 
+Bjarne在他的The C++ Programming Language里面给出过一个助记的方法：**把一个声明从右向左读**。
+
+```c++
+// cp is a const pointer to char 
+char * const cp; // * 读成 pointer to
+
+// p is a pointer to const char; 
+const char * p; 
+
+char const * p; 
+```
+
+同上因为C++里面没有const*的运算符，所以const只能属于前面的类型。
+
+C++标准规定，const关键字放在类型或变量名之前等价的。
+
+See Also: https://www.runoob.com/w3cnote/const-char.html
+
 
 
 ## 拷贝构造 & 拷贝赋值
@@ -84,7 +102,7 @@ String::String(const char* cstr=0)
 
 String::~String() 
 {
-  delte [] m_data;
+  delete [] m_data;
 }
 
 inline 
