@@ -2272,3 +2272,8 @@ swagger serve -F=swagger swagger.json
 - [MSB-Go语言内存管理](https://www.bilibili.com/video/BV1S5411P7ky?p=4&spm_id_from=pageDriver)
 
 - [Go标准库：Go template用法详解](https://www.cnblogs.com/f-ck-need-u/p/10053124.html)
+
+- [Effective Go中文版-看云](https://www.kancloud.cn/kancloud/effective/72199)
+
+- Effective Go: https://golang.google.cn/doc/effective_go
+
