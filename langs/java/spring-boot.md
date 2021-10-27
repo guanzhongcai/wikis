@@ -74,7 +74,11 @@ https://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/htmlsingle/
 application.properties中选择application-dev.properties、application-test.properties..：
 
 ```properties
+# 运行环境选择
 spring.profiles.active=test
+
+# 上传的文件大小
+spring.servlet.multipart.max-file-size=10MB
 ```
 
 application.yaml可用一个文件包括三个环境:
@@ -100,5 +104,56 @@ spring:
 
 
 
+```
+
+
+
+官方文档：
+
+https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.build-systems.starters
+
+
+
+SpringBoot2核心技术与响应式编程:
+
+https://www.yuque.com/atguigu/springboot
+
+教程源码：https://gitee.com/leifengyang/springboot2
+
+
+
+Java8的接口默认实现，即实现类对interface的所有方法不用都实现，可以只实现几个，其他Java8会默认实现。
+
+
+
+```java
+public static void main(String[] args) {
+  CnfigurableApplicationContext run = SpringApplication.run(MainApplication.class, args);
+
+  // 查看容器里面的组件
+  String[] names = run.getBeanDefinitionNames();
+  for (String name : names) {
+    println(name);
+  }
+}
+```
+
+
+
+bean
+
+```java
+@Configuration(proxyBeanMethods = true) // 告诉springboot这是一个配置类 == 配置文件
+public class MyConfig {
+  @Bean
+  public User user01() {
+    return new User("zhangsan", 18);
+  }
+  
+  @Bean("tom")
+  public Pet tomcatPet() {
+    return new Pet("tomcat");
+  }
+}
 ```
 
