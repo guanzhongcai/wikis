@@ -613,9 +613,27 @@ yum install rsync
 
 
 
+
+
+# EOF
+
+EOF，它是end of file的缩写，表示"文字流"（stream）的结尾。这里的"文字流"，可以是文件（file），也可以是标准输入（stdin）。
+
+```c
+#define EOF (-1)
+```
+
+**在Linux系统之中，EOF根本不是一个字符，而是当系统读取到文件结尾，所返回的一个信号值（也就是-1）。**至于系统怎么知道文件的结尾，资料上说是通过比较文件的长度。
+
+
+
+Linux中，在新的一行的开头，按下Ctrl-D，就代表EOF（如果在一行的中间按下Ctrl-D，则表示输出"标准输入"的缓存区，所以这时必须按两次Ctrl-D）；Windows中，Ctrl-Z表示EOF。（顺便提一句，Linux中按下Ctrl-Z，表示将该进程中断，在后台挂起，用fg命令可以重新切回到前台；按下Ctrl-C表示终止该进程。）
+
+
+
 ## 参考资料
 
 - [iptables入门指南 --- iptables详解 ---iptbales 防火墙](https://www.cnblogs.com/liang2580/articles/8400140.html)
 
-
+- [EOF是什么？- 阮一峰](https://www.ruanyifeng.com/blog/2011/11/eof.html)
 

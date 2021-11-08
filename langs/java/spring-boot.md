@@ -157,3 +157,21 @@ public class MyConfig {
 }
 ```
 
+
+
+## 参考资料
+
+- [java model类_java 实体类entity，model模型，javabean的理解以及使用场景](https://blog.csdn.net/weixin_34646919/article/details/114200617)
+
+- [lombok注解来简化java代码](https://blog.csdn.net/xue632777974/article/details/80437452)
+
+
+
+# dubbo
+
+https://dubbo.apache.org/zh/
+
+Dubbo采用全Spring配置方式，透明化接入应用，对应用没有任何api侵入，只需用Spring加载dubbo的配置即可。dubbo基于Spring的schema扩展进行加载。
+
+
+
