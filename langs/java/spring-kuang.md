@@ -34,6 +34,62 @@ spring是如何简化java开发的？4种关键策略：
 
 
 
+## IOC理论推导
+
+dao: UserDao UserDaoImpl UserDaoMysqlImpl UserDaoOracleImpl
+service: UserService UserServiceImpl
+
+原代码：
+
+```java
+
+private UserDao userDao = new UserDaoImpl();
+public void getUser() {
+  public void getUser() {
+    userDao.getUser();
+  }
+}
+```
+
+IOC代码：
+
+```java
+// 需要什么，自己set后再get
+UserService userService = new UserServiceImpl();
+((UserServiceImpl)userService).setUserDao(new UserDaoImp());
+//((UserServiceImpl)userService).setUserDao(new UserDaoMysqlImp());
+//((UserServiceImpl)userService).setUserDao(new UserDaoOrcalImp());
+
+userDao.getUser();
+```
+
+用户的需求可能会影响我们原来的代码，IOC可以改很少，实现需求只做源码文件新增后的注入！！
+
+使用了set注入后，程序变成了被动的接受对象！而非程序员主动创建对象！程序员不用再手动去创建对象了！
+
+
+
+## Bean
+
+- 采用xml方式配置bean的时候，bean的定义信息是和实现分离的，而采用注解的方式可以把两者合为一体！
+
+- bean的定义信息直接以注解的形式定义在实现类中，从而达到零配置的目的。
+
+- 控制反转是一种通过描述（xml或注解）并通过第三方去生产或获取特定对象的方式。
+- 在spring中实现控制反转的是IOC容器，其实现方法是依赖注入（Dependence Injection，DI）
+
+
+
+src/resources/beans.xml
+
+```xml
+<bean id="hello" class="com.kuang.pojo.Hello">
+	<property name="str" value="spring"/>
+</bean>
+```
+
+
+
 
 
 ## springboot
