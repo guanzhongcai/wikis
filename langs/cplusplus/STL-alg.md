@@ -377,3 +377,9 @@ inner_product：计算两个区间元素的内积
 adjacent_difference：计算区间内相邻元素之间的差
 partial_sum：计算区间内元素的部分和
 ————————————————
+
+
+
+
+
+![]()
