@@ -17,6 +17,23 @@
 （3）树的左右两边的层级数相差不会大于1;
 （4）没有值相等重复的节点;
 
+总结：左节点比父节点要小；右节点比父节点要大；高度决定查找效率
+
+
+
+<img src="algo/binary-search-tree.png" style="zoom:50%;" />
+
+遍历分为三种（递归的按照相同方法逐层遍历）：
+
+- 前序遍历：左子树-》根节点-》右子树  
+  - 246 -> 123 46 -> 123 4 567
+- 中序遍历：根节点-》左子树-》右子树 
+  - 426 -> 4 213 6 -> 4 213 657
+- 后续遍历：左子树-》右子树-》根节点 
+  - 264 -> 132 64 -> 132 576 4
+
+https://www.bilibili.com/video/BV135411h7wJ?p=1
+
 
 
 ## B树
@@ -69,3 +86,15 @@ B树相对于B+树的优点是，如果经常访问的数据离根节点很近�
 ## 红黑树
 
 ![](algo/red-black-tree/rbtree.png)
+
+
+
+在线红黑树动态测试：
+
+https://www.cs.usfca.edu/~galles/visualization/RedBlack.html
+
+![](algo/red-black-tree/dynamic-demo.png)
+
+
+
+演示时的画图软件：Epic Pen
