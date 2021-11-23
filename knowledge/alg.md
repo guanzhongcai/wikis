@@ -52,6 +52,14 @@
 
 
 
+## AVL树
+
+高度平衡树。因为平衡二叉树会有倾斜的情况产生，所以有了AVL树。
+
+特性是：左右子树高度差不超过1
+
+谁不平衡就旋转谁！从最小的子树开始旋转，但每次插入都做check，旋转次数容易太多！
+
 https://www.bilibili.com/video/BV135411h7wJ?p=1
 
 
@@ -118,3 +126,13 @@ https://www.cs.usfca.edu/~galles/visualization/RedBlack.html
 
 
 演示时的画图软件：Epic Pen
+
+
+
+红黑树：只要求每个线路上的黑色节点是平衡的，就OK
+
+
+
+## 234树
+
+![](algo/2-3-4-tree.png)
