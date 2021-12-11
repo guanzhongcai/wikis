@@ -674,6 +674,14 @@ maven由于它的约定大于配置，可能会遇到写的配置文件，无法
 
 
 
+## Jackson
+
+ObjectMapper 是 Jackson 提供的一个类，作用是将 java 对象与 json 字符串相互转化。
+
+[ObjectMapper 的用法](https://www.cnblogs.com/youcoding/p/14888537.html)
+
+
+
 ## Questions
 
 - JVM的常用调优参数有哪些？

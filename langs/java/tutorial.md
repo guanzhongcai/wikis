@@ -775,3 +775,7 @@ Java本身是一种设计的非常简单，非常精巧的语言，所以Java背
 - [cnblogs-kuangshen-SpringBoot系列](https://www.cnblogs.com/hellokuangshen/tag/SpringBoot%E7%B3%BB%E5%88%97/)
 - [使用spring JPA访问MySQL数据](https://spring.io/guides/gs/accessing-data-mysql/)
 - [运行原理探究](https://www.cnblogs.com/hellokuangshen/p/12450327.html)
+
+- [fastjson-best-practice](http://kimmking.github.io/2017/06/06/json-best-practice/)
+
+- [fastjson-hot-examples](https://java.hotexamples.com/zh/examples/com.alibaba.fastjson/JSONObject/-/java-jsonobject-class-examples.html)
