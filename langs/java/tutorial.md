@@ -779,3 +779,6 @@ Java本身是一种设计的非常简单，非常精巧的语言，所以Java背
 - [fastjson-best-practice](http://kimmking.github.io/2017/06/06/json-best-practice/)
 
 - [fastjson-hot-examples](https://java.hotexamples.com/zh/examples/com.alibaba.fastjson/JSONObject/-/java-jsonobject-class-examples.html)
+
+-  [Fastjson 简明教程]( https://www.runoob.com/w3cnote/fastjson-intro.html)
+
