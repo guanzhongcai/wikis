@@ -248,6 +248,42 @@ output.elasticsearch: # 指定ES的配置
 
 随后通过elasticsearch-head中可以查看filebeat的统计信息，会新增了索引，数据浏览中也可以查看数据。
 
+```yaml
+filebeat.inputs:
+- type: log
+  enabled: true 
+  paths:
+  - D:\ToolServices\service-manager\log\RtAPPManager-*.log
+  tags: ["app-manager"] # 添加自定义tag，便于后续的处理
+  fields: # 添加自定义字段
+    from: service-manager
+  fields_under_root: true # true为添加到根节点，false为添加到子节点中  
+# setup.template.settings:
+#   index.number_of_shareds: 3
+setup.template.enabled: false
+output.elasticsearch: # 指定ES的配置
+  hosts: ["localhost:9200"]
+```
+
+
+
+[Windows下查看应用的命令行参数](https://jingyan.baidu.com/article/11c17a2ccfb5daf446e39dbf.html)：
+
+```powershell
+C:\Users\zhongcai.guan>wmic process where caption="filebeat.exe" get caption,commandline /value
+
+
+Caption=filebeat.exe
+CommandLine="C:\Program Files\Elastic\Beats\8.0.1\filebeat\filebeat.exe"  --path.home "C:\Program Files\Elastic\Beats\8.0.1\filebeat" --path.config "C:\ProgramData\Elastic\Beats\filebeat" --path.data "C:\ProgramData\Elastic\Beats\filebeat\data" --path.logs "C:\ProgramData\Elastic\Beats\filebeat\logs" -E logging.files.redirect_stderr=true
+```
+
+启动测试：
+
+```powershell
+C:\Program Files\Elastic\Beats\8.0.1\filebeat
+filebeat.exe -e -c C:\ProgramData\Elastic\Beats\filebeat\out2es.yml
+```
+
 
 
 ### nginx日志收集
@@ -709,6 +745,62 @@ logstash捕获到的日志：
   mongodb/file/exec/http/tcp/rabbitmq/kafka/redis/..
 
 - filter plugin: 过滤器（beats）
+
+
+
+## docker-compose版
+
+```yaml
+# ELK/filebeat服务
+
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.9.3
+    container_name: elasticsearch
+    restart: always
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms256m -Xmx1024m
+    networks: 
+      - webtps    
+    volumes:  
+      - es_data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.3 
+    container_name: kibana
+    restart: always
+    ports:
+      - 5601:5601
+    environment:
+      - I18N_LOCALE=zh-CN
+      - XPACK_GRAPH_ENABLED=true
+      - TIMELION_ENABLED=true
+      - XPACK_MONITORING_COLLECTION_ENABLED="true"
+    depends_on:
+      - elasticsearch
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.0.1
+    container_name: filebeat
+    restart: always
+    depends_on:
+      - elasticsearch
+      - kibana
+
+
+volumes: 
+  es_data:
+
+networks: 
+  webtps:
+    name: webtps_bridge
+```
 
 
 
