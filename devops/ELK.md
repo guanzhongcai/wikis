@@ -739,6 +739,26 @@ filebeat -> rabbitmq -> logagent -> solar
 
 
 
+# docker版本
+
+便于日常运维和部署
+
+
+
+## 目标
+
+- elasticsearch和kibana是docker版本
+- filebeat既有docker版本也有自管理版本
+- filebeat收集日志到es中
+- 多日志源，包括自研的gin、java、dotnet应用，也包括postgresql和rabbitmq等日志
+- 日志目标的展示支持gin、log4j、log4net、Windows events等
+- 带dashboard
+- 常用查询
+- filebeat的配置
+- kibana的配置和使用
+
+
+
 ## 参考资料
 
 - [Elastic Stack（ELK）从入门到实践](https://www.bilibili.com/video/BV1iJ411c7Az?t=82&p=60)

@@ -1111,6 +1111,22 @@ vim /etc/ssh/sshd_config
 
 ![image-20210605073856081](../images/vagrant-vscode.png)
 
+
+
+# container vs host kernal
+
+我在此视频中解释了哪些容器：[https](https://www.youtube.com/watch?v=98ZNU1KqJfc) ://www.youtube.com/watch?v=98ZNU1KqJfc 。本质上，容器实际上并不存在。这是一个在内核上正常运行的进程，但有一个进入分层文件系统的 chroot 并受 cgroups 和命名空间的限制。cgroup 限制了它可以使用的内容（CPU/内存/磁盘），而命名空间限制了它可以看到的内容。但是没有涉及其他层。这是一个在内核上运行的普通 Linux 进程。
+
+
+
+这就引出了第二点：Ubuntu 和 Oracle Linux 以及所有其他 Linux 都运行相同的 Linux 内核。您知道二进制文件和库是兼容的，因为 Linux 内核保证向前和向后兼容性。这就是为什么我们可以在一台机器上同时拥有 RHCK 和 UEK 的原因。它仍然被认为是 Ubuntu，因为发行版之间唯一真正不同的是他们做出的用户空间选择，而不是他们使用的内核。发行版对内核的唯一区别是它打开或关闭了哪些功能，但底层的二进制兼容性仍然存在。
+
+
+
+对于容器来说，这也不是一个真正的问题，因为它们很少运行任何直接与内核交互的东西。这就是 glibc 的用途。
+
+
+
 # 参考资料
 
 - [docker核心基础](https://www.bilibili.com/video/BV1Vs411E7AR?p=11)
@@ -1125,3 +1141,4 @@ vim /etc/ssh/sshd_config
 
 - [Dockerfile最佳实践-text](https://k8s.coding3min.com/docker-jing-xiang/best-dockerfile)
 
+- [了解 Docker“容器主机”与 Linux 和 Windows 容器的“容器操作系统”](http://www.floydhilton.com/docker/2017/03/31/Docker-ContainerHost-vs-ContainerOS-Linux-Windows.html)

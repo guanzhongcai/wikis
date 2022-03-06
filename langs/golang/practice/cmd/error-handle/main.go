@@ -6,6 +6,31 @@ import (
 	"net/http"
 )
 
+// Similarly, this error is exported
+// so that users of this package can match it
+// with errors.As.
+
+type NotFoundError struct {
+	File string
+}
+
+func (e *NotFoundError) Error() string {
+	return fmt.Sprintf("file %q not found", e.File)
+}
+
+// And this error is not exported because
+// we don't want to make it part of the public API.
+// We can still use it inside the package
+// with errors.As.
+
+type resolveError struct {
+	Path string
+}
+
+func (e *resolveError) Error() string {
+	return fmt.Sprintf("resolve %q", e.Path)
+}
+
 type Result struct {
 	Error    error
 	Response *http.Response
@@ -14,7 +39,7 @@ type Result struct {
 func main() {
 
 	// 返回可读取的channel，以检索循环迭代的结果
-	checkStatus := func(done <-chan interface{}, urls ... string) <-chan Result {
+	checkStatus := func(done <-chan interface{}, urls ...string) <-chan Result {
 		results := make(chan Result)
 		go func() {
 			defer close(results)
