@@ -851,9 +851,65 @@ filebeat -> rabbitmq -> logagent -> solar
 
 
 
+## 加载外部配置文件
+
+Filebeat允许将配置分隔为多个较小的配置文件，然后加载外部配置文件。
+
+**输入配置**
+
+```yml
+filebeat.config.inputs:
+  enabled: true
+  path: configs/*.yml
+```
+
+每一个在path下的文件都必须包含一个或多个input定义，例如：
+
+```yml
+- type: log
+  paths:
+    - /var/log/mysql.log
+  scan_frequency: 10s
+
+- type: log
+  paths:
+    - /var/log/apache.log
+  scan_frequency: 5s
+```
+
+
+
+# curl命令操作elasticsearch
+
+详见：https://blog.csdn.net/lixi5718/article/details/76270700
+
+```bash
+#  1.查询数据
+  curl -XGET ‘http://localhost:9200/{index}/{type}/{id}’
+#  2.索引(插入)数据
+  curl -XPOST ‘http://localhost:9200/{index}/{type}/{id}’ -d'{“key”:”value”,“key”:”value”}’
+#  3.批量导入数据(在a.json文件所在当前文件下)
+  curl -XPOST 'localhost:9200/{index}/{type}/_bulk' --data-binary "@a.json"
+```
+
+
+
+```http
+查看具体命令 curl localhost:9200/_cat
+  1.集群健康状态
+  /_cat/health 
+  2.资源信息
+  /_cat/allocation
+  3.查看文档总数
+  /_cat/count
+```
+
+
+
 ## 参考资料
 
 - [Elastic Stack（ELK）从入门到实践](https://www.bilibili.com/video/BV1iJ411c7Az?t=82&p=60)
 
-
+- [filebeat-中文指南](https://elkguide.elasticsearch.cn/beats/file.html)
+- [Filebeat 模块与配置](https://www.cnblogs.com/cjsblog/p/9495024.html)
 

@@ -53,8 +53,14 @@ numberlist.stream().filter(num -> num != null).count();
 
 
 
+## FILE
+
+![](images/iobuf-file.png)
+
 ## 参考资料
 
 - [到底什么是Stream流？](https://www.cnblogs.com/MrYuChen-Blog/p/14042801.html)
 
 - [Stream初步认识（一）](https://www.cnblogs.com/MrYuChen-Blog/p/14036225.html)
+
+- https://blog.51cto.com/lingdandan/1760155#:~:text=FILE%E7%BB%93%E6%9E%84%E4%BD%93%E7%94%A8%E4%BA%8E%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C%EF%BC%8C%E5%AE%9A%E4%B9%89%E5%9C%A8C%E8%AF%AD%E8%A8%80%E7%9A%84stdio.h%E5%A4%B4%E6%96%87%E4%BB%B6%E4%B8%AD%20%E6%88%91%E4%BB%AC%E9%80%9A%E5%B8%B8%E6%89%80%E5%86%99%E7%9A%84FILE,%2Afp%3B%20%E5%AE%9A%E4%B9%89%E4%BA%86%E4%B8%80%E4%B8%AA%E6%8C%87%E5%90%91%E8%AF%A5%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E6%8C%87%E9%92%88%EF%BC%8C%E9%80%9A%E8%BF%87fopen%20%28%29%E8%BF%94%E5%9B%9E%E4%B8%80%E4%B8%AA%E6%8C%87%E5%90%91%E8%A6%81%E6%89%93%E5%BC%80%EF%BC%88%E6%88%96%E5%86%99%E5%85%A5%E3%80%81%E5%88%9B%E5%BB%BA%EF%BC%89%E6%96%87%E4%BB%B6%E7%9A%84%E6%8C%87%E9%92%88
