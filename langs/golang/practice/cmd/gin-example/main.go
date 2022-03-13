@@ -10,7 +10,7 @@ func main() {
 		})
 	})
 	r.GET("/mongo/ping", func(c *gin.Context) {
-		mongoAccess()
+		//mongoAccess()
 		c.JSON(200, gin.H{
 			"message": "mongo pong",
 		})

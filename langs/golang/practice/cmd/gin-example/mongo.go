@@ -12,7 +12,7 @@ import (
 
 var client *mongo.Database
 
-func init()  {
+func initMongo()  {
 	var err error
 	uri:= "mongodb://admin:123456@localhost:27017"
 	client, err = ConnectToDB(uri, "testing", 2*time.Second, 10)

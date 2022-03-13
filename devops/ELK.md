@@ -158,8 +158,6 @@ echo "good luck" >> a.log
 
 
 
-
-
 ### 自定义字段
 
 配置文件：itcast-log.yml
@@ -283,6 +281,12 @@ CommandLine="C:\Program Files\Elastic\Beats\8.0.1\filebeat\filebeat.exe"  --path
 C:\Program Files\Elastic\Beats\8.0.1\filebeat
 filebeat.exe -e -c C:\ProgramData\Elastic\Beats\filebeat\out2es.yml
 ```
+
+
+
+### 配置文件详解
+
+https://www.cnblogs.com/zlslch/p/6622079.html
 
 
 
@@ -519,13 +523,23 @@ docker start elasticsearch-head
 
 注意：
 
-由于前后端分离，所以会存在跨域的问题，需要在服务端做cors的配置：
+由于前后端分离，所以会存在跨域的问题，需要在elasticsearch端配置CORS：
 
 ```yml
 # vim elasticsearch.yml 添加：
 http.cors.enabled: true
 http.cors.allow-orgin: "*"
 ```
+
+
+
+连接带用户名和密码的elasticsearch：
+
+```
+http://localhost:9100/?auth_user=elastic&auth_password=changeme
+```
+
+
 
 
 
@@ -620,7 +634,18 @@ x server：连接linux系统的windows的UI工具
    ./filebeat -e -c itcast-nginx.yml
    ```
 
-   
+
+
+
+### grokdebugger
+
+```
+http://localhost:5601/app/dev_tools#/grokdebugger
+```
+
+
+
+
 
 ## logstash
 
@@ -894,7 +919,7 @@ filebeat.config.inputs:
 
 
 
-```http
+```ht
 查看具体命令 curl localhost:9200/_cat
   1.集群健康状态
   /_cat/health 
@@ -903,6 +928,15 @@ filebeat.config.inputs:
   3.查看文档总数
   /_cat/count
 ```
+
+
+
+
+
+## Todo
+
+- filebeat手机docker容器中stdout的gin日志到logstash中，在kibana中展示
+- 同理，abp、springboot等
 
 
 
