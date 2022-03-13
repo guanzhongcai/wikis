@@ -504,6 +504,35 @@ sql> select * from indexName;
 
 
 
+### curl命令操作
+
+详见：https://blog.csdn.net/lixi5718/article/details/76270700
+
+```bash
+#  1.查询数据
+  curl -XGET ‘http://localhost:9200/{index}/{type}/{id}’
+#  2.索引(插入)数据
+  curl -XPOST ‘http://localhost:9200/{index}/{type}/{id}’ -d'{“key”:”value”,“key”:”value”}’
+#  3.批量导入数据(在a.json文件所在当前文件下)
+  curl -XPOST 'localhost:9200/{index}/{type}/_bulk' --data-binary "@a.json"
+```
+
+
+
+```ht
+查看具体命令 curl localhost:9200/_cat
+  1.集群健康状态
+  /_cat/health 
+  2.资源信息
+  /_cat/allocation
+  3.查看文档总数
+  /_cat/count
+```
+
+
+
+
+
 ### elasticsearch-head安装
 
 - chrome插件安装：搜索elasticsearch-head，安装后使用
@@ -645,13 +674,43 @@ http://localhost:5601/app/dev_tools#/grokdebugger
 
 
 
+### X-Pack
+
+> https://www.oschina.net/p/x-pack?hmsr=aladdin1e1
+
+X-Pack 是一个Elastic Stack的扩展，将**安全，警报，监视，报告和图形功能**包含在一个易于安装的软件包中。在Elasticsearch 5.0.0 之前，您必须安装单独的Shield，Watcher和Marvel插件才能获得在X-Pack中所有的功能
+
+X-pack监控组件使您可以通过Kibana轻松地监控ElasticSearch。您可以实时查看集群的健康和性能，以及分析过去的集群、索引和节点度量。此外，您可以监视Kibana本身性能。当你安装X-pack在群集上，监控代理运行在每个节点上收集和指数指标从Elasticsearch。安装在X-pack在Kibana上，您可以查看通过一套专门的仪表板监控数据。
+
+![x-pack](elastic/x-pack.png)
 
 
-## logstash
+
+## LogStash
 
 基于java，是个开源的用于收集，分析和存储日志的工具。
 
 logstash的采集工作已经被beats代替掉了，因为前者是java的，需要一个JVM，速度太慢。现在基本通过beats采集。
+
+
+
+### [进入容器时给容器root权限](https://www.cnblogs.com/sucretan2010/p/12811418.html)
+
+执行以下命令给容器root权限：
+
+```bash
+docker exec -u 0 -it mycontainer bash
+```
+
+ 
+
+在容器里root用户的默认ID是0，所以指定root用户的ID即有root权限
+
+或者直接root 用户
+
+```bash
+docker exec -it --user root mycontainer bash
+```
 
 
 
@@ -904,39 +963,93 @@ filebeat.config.inputs:
 
 
 
-# curl命令操作elasticsearch
+## 多项目实践
 
-详见：https://blog.csdn.net/lixi5718/article/details/76270700
+> https://blog.csdn.net/wsdc0521/article/details/106308441
 
-```bash
-#  1.查询数据
-  curl -XGET ‘http://localhost:9200/{index}/{type}/{id}’
-#  2.索引(插入)数据
-  curl -XPOST ‘http://localhost:9200/{index}/{type}/{id}’ -d'{“key”:”value”,“key”:”value”}’
-#  3.批量导入数据(在a.json文件所在当前文件下)
-  curl -XPOST 'localhost:9200/{index}/{type}/_bulk' --data-binary "@a.json"
+filebeat.yml
+
+```yaml
+filebeat.inputs:
+- type: log
+  enabled: true
+  backoff: "1s"
+  tail_files: false
+  paths:
+    - /usr/local/nginx/logs/access-json.log
+  fields:
+    filetype: log_nginxjson
+  fields_under_root: true
+  
+- type: log
+  enabled: true
+  backoff: "1s"
+  tail_files: false
+  paths:
+    - /var/log/messages
+  fields:
+    filetype: log_system
+  fields_under_root: true
+  
+output.logstash:
+  enabled: true
+  hosts: ["wykd:5044"]
 ```
 
 
 
-```ht
-查看具体命令 curl localhost:9200/_cat
-  1.集群健康状态
-  /_cat/health 
-  2.资源信息
-  /_cat/allocation
-  3.查看文档总数
-  /_cat/count
+logstash.conf
+
+```yaml
+input {
+   #从filebeat取数据，端口与filebeat配置文件一致
+   beats {
+     host => "0.0.0.0"
+     port => 5044
+   }
+}
+
+filter {
+    #只对nginx的json日志做json解析，系统message为其他格式，无需处理
+    if [filetype] == "log_nginxjson"{
+      json {
+         source => "message"
+         remove_field => ["beat","offset","tags","prospector"] #移除字段，不需要采集
+      }
+      date {
+        match => ["timestamp", "dd/MMM/yyyy:HH:mm:ss Z"] #匹配timestamp字段
+        target => "@timestamp"  #将匹配到的数据写到@timestamp字段中
+      }
+  }
+}
+ 
+output {
+       # 输出es，这的filetype就是在filebeat那边新增的自定义字段名
+       if [filetype] == "log_nginxjson" {
+         elasticsearch {
+            hosts => ["wykd:9200"]
+            index => "nginx-%{+YYYY.MM.dd}"
+        }
+       } else if [filetype] == "log_system" {
+         elasticsearch {
+            hosts => ["wykd:9200"]
+            index => "msg-%{+YYYY.MM.dd}"
+        }
+       }
+ 
+}
 ```
 
 
 
+# Todo
 
-
-## Todo
-
-- filebeat手机docker容器中stdout的gin日志到logstash中，在kibana中展示
-- 同理，abp、springboot等
+- [ ] filebeat收集docker容器中stdout的gin日志到logstash中，在kibana中展示
+- [ ] 多输入源、多过滤器、输出到不同的es的索引中
+- [ ] 同理，abp、springboot等
+- [x] grok
+- [ ] tag：是针对不同的Service来设定的
+- [ ] source
 
 
 
