@@ -382,6 +382,28 @@ https://n8bn2y81.mirror.aliyuncs.com加到"registry-mirrors"的数组里，点�
 
 
 
+## 使用 Compose 启用 GPU 访问
+
+https://docs.docker.com/compose/gpu-support/
+
+```yaml
+version: "3.2"
+
+services:
+  test:
+    image: nvidia/cuda:10.2-base
+    command: nvidia-smi
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+```
+
+
+
 # Docker Machine
 
 Docker Machine 是一种可以让您在虚拟主机上安装 Docker 的工具，并可以使用 docker-machine 命令来管理主机。

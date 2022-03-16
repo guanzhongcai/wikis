@@ -1050,13 +1050,16 @@ output {
 - [x] grok
 - [ ] tag：是针对不同的Service来设定的
 - [ ] source
+- [ ] 索引的过期策略
+- [ ] 自动收集docker容器的日志并展示在kibana侧
 
 
 
 ## 参考资料
 
 - [Elastic Stack（ELK）从入门到实践](https://www.bilibili.com/video/BV1iJ411c7Az?t=82&p=60)
-
 - [filebeat-中文指南](https://elkguide.elasticsearch.cn/beats/file.html)
 - [Filebeat 模块与配置](https://www.cnblogs.com/cjsblog/p/9495024.html)
-
+- [Kibana7.9.2设置elasticsearch索引过期时间，到期自动删除](https://blog.csdn.net/qq_41631365/article/details/109773675?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-109773675.pc_agg_new_rank&utm_term=elk+%E8%AE%BE%E7%BD%AE%E7%B4%A2%E5%BC%95%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4&spm=1000.2123.3001.4430)
+- [bash-declare/local](https://ss64.com/bash/declare.html)
+- 
