@@ -365,7 +365,127 @@ filebeat有两个主要组件：prospector 和 harvester
 
 
 
-### Module
+### Registry文件
+
+> [Filebeat的Registry文件解读 (qq.com)](https://mp.weixin.qq.com/s/H5QiZ10KSdUXFW5LdH79wA)
+
+Filebeat会将自己处理日志文件的进度信息写入到registry文件中，以保证filebeat在重启之后能够接着处理未处理过的数据，而无需从头开始
+
+registry文件内容为一个list，list里的每个元素都是一个字典，字典的格式如下：
+
+```json
+{
+    "source": "/home/logs/app/exception.log",
+    "offset": 8137,
+    "FileStateOS": {
+        "inode": 1048,
+        "device": 29
+    },
+    "timestamp": "2019-03-28T13:31:10.87878789+08:00",
+    "ttl": -1
+}
+```
+
+每个字段的意义解释：
+
+**source：** 记录采集日志的完整路径
+
+**offset：** 采集这个日志文件到了哪个位置，总采集字节数
+
+**inode：** 日志文件的inode号，关于inode的详细解释看下文
+
+**device：** 日志所在的磁盘编号，下文`stat`命令中Device的值
+
+**timestamp：** 日志最后一次发生变化的时间戳
+
+**ttl：** 采集失效时间，-1表示永不失效
+
+Filebeat在每次启动时都会来读取这个文件，如果文件不存在则会创建新文件
+
+
+
+
+
+### inode相关知识
+
+硬盘格式化的时候，操作系统自动将硬盘分成了两个区域。
+
+一个是**数据区**，用来存放文件的数据信息
+
+一个是**inode区**，用来存放文件的元信息，比如文件的创建者、创建时间、文件大小等等
+
+每一个文件都有对应的inode，里边包含了与该文件有关的一些信息，**可以用`stat`命令查看文件的inode信息**
+
+```bash
+# stat /home/logs/app/exception.log
+  File: '/home/logs/app/exception.log'
+  Size: 40210         Blocks: 80         IO Block: 4096   regular file
+Device: 1dh/29d    Inode: 1038        Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2019-03-28 00:27:01.522594000 +0800
+Modify: 2019-03-28 15:59:14.582594000 +0800
+Change: 2019-03-28 15:59:14.582594000 +0800
+ Birth: -
+```
+
+我们可能遇到过明明查看磁盘空间还充足，但无法创建新文件的问题，这时候可能就是因为磁盘的inode用完了，磁盘的inode可以通过命令`df -i`查看
+
+```bash
+# df -i
+Filesystem        Inodes IUsed     IFree IUse% Mounted on
+none           104855552 39836 104815716    1% /
+tmpfs            1024703    16   1024687    1% /dev
+tmpfs            1024703    10   1024693    1% /sys/fs/cgroup
+/dev/vdc1      104855552 39836 104815716    1% /etc/hosts
+```
+
+每个inode都有一个号码，操作系统就是通过这个号码来识别不同文件的，这个号码就是filebet配置中的inode，可以通过`ls -i`命令查看
+
+```
+# ls -i /home/logs/app/exception.log
+1048 /home/logs/app/exception.log
+```
+
+可能你查看registry文件发现**同名的log文件记录有很多条**，造成这个的主要原因是你的log文件可能被重命名过，常见的场景例如log4j里边的每日生成一个日志文件，把老的日志文件重命名
+
+
+
+### logstash有关配置参数
+
+**registry_file：** registry文件路径，可以只写文件名，那么文件会创建在默认的`${path.data}`目录下，也可以指定一个绝对路径
+
+**registry_file_permissions：** registry文件的权限，默认是0600，只有属主有读写权限
+
+**registry_flush：** registry文件的刷新时间，默认为0，表示实时刷新，filebeat处理一条日志就实时的将信息写入到registry文件中，这在日志量大的时候会频繁读写registry文件，可考虑适当增加这个值来降低磁盘开销
+
+如果filebeat在处理发送事件时还没有等到output的响应就意外关闭或僵死了，新发送的日志状态没有来得及记录进registry文件中，那么在filebeat重新启动后会去读取registry文件记录的信息重新发送日志，这确保了所有日志都被发送过，但可能会有重复的日志被发送
+
+
+
+### 重新从头读取日志
+
+有些情况下我们需要让filebeat重新从头读取日志，尤其是在调试的时候，有了上边的知识我们就很容易实现filebeat重新从头读取日志了，核心的思想就是干掉registry文件
+
+1. 找到registry文件的位置，如果没有单独配置那么文件路径为`/var/lib/filebeat/registry`，不在也没关心，可以直接find命令查找
+
+```
+# find / -name registry
+/var/lib/filebeat/registry
+```
+
+2. 关闭filebeat --> 删掉registry文件 --> 启动filebeat
+
+```
+/etc/init.d/filebeat stop &&\
+rm -r /var/lib/filebeat/registry &&\
+/etc/init.d/filebeat start
+```
+
+3. 查看registry文件内容重新生成了数据
+
+
+
+### Modules
 
 前面要想实现日志数据的读取以及处理都是自己要手动配置的！其实，在filebeat中，有大量的module，可以简化我们的配置！直接用就可以了！
 
