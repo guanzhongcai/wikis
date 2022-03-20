@@ -735,6 +735,118 @@ RUN ["bin/bash", "-c" "set -o pipefail && wget -O https://some.site | wc -l > /n
 
 
 
+### run
+
+https://docs.docker.com/engine/reference/commandline/run/
+
+选项（option）：
+
+| 名称，简写                | 默认      | 描述                                                         |
+| ------------------------- | --------- | ------------------------------------------------------------ |
+| `--add-host`              |           | 添加自定义主机到 IP 映射 (host:ip)                           |
+| `--attach`,`-a`           |           | 连接到 STDIN、STDOUT 或 STDERR                               |
+| `--blkio-weight`          |           | 块 IO（相对权重），介于 10 和 1000 之间，或 0 禁用（默认 0） |
+| `--blkio-weight-device`   |           | 块 IO 权重（相对设备权重）                                   |
+| `--cap-add`               |           | 添加 Linux 功能                                              |
+| `--cap-drop`              |           | 放弃 Linux 功能                                              |
+| `--cgroup-parent`         |           | 容器的可选父 cgroup                                          |
+| `--cgroupns`              |           | [**API 1.41+**](https://docs.docker.com/engine/api/v1.41/) 要使用的 Cgroup 命名空间 (host\|private) 'host'：在 Docker 主机的 cgroup 命名空间中运行容器 'private'：在其自己的私有 cgroup 命名空间中运行容器 ''：使用由 default-cgroupns- 配置的 cgroup 命名空间守护程序上的模式选项（默认） |
+| `--cidfile`               |           | 将容器 ID 写入文件                                           |
+| `--cpu-count`             |           | CPU 计数（仅限 Windows）                                     |
+| `--cpu-percent`           |           | CPU 百分比（仅限 Windows）                                   |
+| `--cpu-period`            |           | 限制 CPU CFS（完全公平调度器）周期                           |
+| `--cpu-quota`             |           | 限制 CPU CFS（完全公平调度器）配额                           |
+| `--cpu-rt-period`         |           | [**API 1.25+**](https://docs.docker.com/engine/api/v1.25/) 以微秒为单位限制 CPU 实时周期 |
+| `--cpu-rt-runtime`        |           | [**API 1.25+**](https://docs.docker.com/engine/api/v1.25/) 以微秒为单位限制 CPU 实时运行时间 |
+| `--cpu-shares`,`-c`       |           | CPU 份额（相对权重）                                         |
+| `--cpus`                  |           | [**API 1.25+**](https://docs.docker.com/engine/api/v1.25/) CPU 数量 |
+| `--cpuset-cpus`           |           | 允许执行的 CPU (0-3, 0,1)                                    |
+| `--cpuset-mems`           |           | 允许执行的 MEM (0-3, 0,1)                                    |
+| `--detach`,`-d`           |           | 在后台运行容器并打印容器 ID                                  |
+| `--detach-keys`           |           | 覆盖用于分离容器的键序列                                     |
+| `--device`                |           | 将主机设备添加到容器                                         |
+| `--device-cgroup-rule`    |           | 将规则添加到 cgroup 允许的设备列表                           |
+| `--device-read-bps`       |           | 限制设备的读取速率（每秒字节数）                             |
+| `--device-read-iops`      |           | 限制设备的读取速率（每秒 IO）                                |
+| `--device-write-bps`      |           | 限制设备的写入速率（每秒字节数）                             |
+| `--device-write-iops`     |           | 限制设备的写入速率（每秒 IO）                                |
+| `--disable-content-trust` | `true`    | 跳过图像验证                                                 |
+| `--dns`                   |           | 设置自定义 DNS 服务器                                        |
+| `--dns-opt`               |           | 设置 DNS 选项                                                |
+| `--dns-option`            |           | 设置 DNS 选项                                                |
+| `--dns-search`            |           | 设置自定义 DNS 搜索域                                        |
+| `--domainname`            |           | 容器 NIS 域名                                                |
+| `--entrypoint`            |           | 覆盖图像的默认入口点                                         |
+| `--env`,`-e`              |           | 设置环境变量                                                 |
+| `--env-file`              |           | 读入环境变量文件                                             |
+| `--expose`                |           | 公开一个端口或一系列端口                                     |
+| `--gpus`                  |           | [**API 1.40+**](https://docs.docker.com/engine/api/v1.40/) 要添加到容器中的 GPU 设备（“全部”以传递所有 GPU） |
+| `--group-add`             |           | 添加其他组以加入                                             |
+| `--health-cmd`            |           | 运行以检查运行状况的命令                                     |
+| `--health-interval`       |           | 运行检查之间的时间 (ms\|s\|m\|h) (默认 0s)                   |
+| `--health-retries`        |           | 需要报告不健康的连续失败                                     |
+| `--health-start-period`   |           | [**API 1.29+**](https://docs.docker.com/engine/api/v1.29/) 开始健康重试倒计时之前容器初始化的开始时间（ms\|s\|m\|h）（默认 0s） |
+| `--health-timeout`        |           | 允许运行一项检查的最长时间 (ms\|s\|m\|h) (默认 0s)           |
+| `--help`                  |           | 打印使用                                                     |
+| `--hostname`,`-h`         |           | 容器主机名                                                   |
+| `--init`                  |           | [**API 1.25+**](https://docs.docker.com/engine/api/v1.25/) 在容器内运行一个 init 来转发信号并收获进程 |
+| `--interactive`,`-i`      |           | 即使没有连接，也保持 STDIN 打开                              |
+| `--io-maxbandwidth`       |           | 系统驱动器的最大 IO 带宽限制（仅限 Windows）                 |
+| `--io-maxiops`            |           | 系统驱动器的最大 IOps 限制（仅限 Windows）                   |
+| `--ip`                    |           | IPv4 地址（例如，172.30.100.104）                            |
+| `--ip6`                   |           | IPv6 地址（例如，2001:db8::33）                              |
+| `--ipc`                   |           | 要使用的 IPC 模式                                            |
+| `--isolation`             |           | 容器隔离技术                                                 |
+| `--kernel-memory`         |           | 内核内存限制                                                 |
+| `--label`,`-l`            |           | 在容器上设置元数据                                           |
+| `--label-file`            |           | 读入以行分隔的标签文件                                       |
+| `--link`                  |           | 添加到另一个容器的链接                                       |
+| `--link-local-ip`         |           | 容器 IPv4/IPv6 链路本地地址                                  |
+| `--log-driver`            |           | 容器的日志记录驱动程序                                       |
+| `--log-opt`               |           | 日志驱动程序选项                                             |
+| `--mac-address`           |           | 容器 MAC 地址（例如，92:d0:c6:0a:29:33）                     |
+| `--memory`,`-m`           |           | 内存限制                                                     |
+| `--memory-reservation`    |           | 内存软限制                                                   |
+| `--memory-swap`           |           | 交换限制等于内存加上交换：'-1' 启用无限交换                  |
+| `--memory-swappiness`     | `-1`      | 调整容器内存交换（0 到 100）                                 |
+| `--mount`                 |           | 将文件系统挂载附加到容器                                     |
+| `--name`                  |           | 为容器分配名称                                               |
+| `--net`                   |           | 将容器连接到网络                                             |
+| `--net-alias`             |           | 为容器添加网络范围的别名                                     |
+| `--network`               |           | 将容器连接到网络                                             |
+| `--network-alias`         |           | 为容器添加网络范围的别名                                     |
+| `--no-healthcheck`        |           | 禁用任何容器指定的 HEALTHCHECK                               |
+| `--oom-kill-disable`      |           | 禁用 OOM 杀手                                                |
+| `--oom-score-adj`         |           | 调整主机的 OOM 首选项（-1000 到 1000）                       |
+| `--pid`                   |           | 要使用的 PID 命名空间                                        |
+| `--pids-limit`            |           | 调整容器 pids 限制（设置 -1 表示无限制）                     |
+| `--platform`              |           | [**API 1.32+**](https://docs.docker.com/engine/api/v1.32/) 如果服务器支持多平台，则设置平台 |
+| `--privileged`            |           | 授予此容器扩展权限                                           |
+| `--publish`,`-p`          |           | 将容器的端口发布到主机                                       |
+| `--publish-all`,`-P`      |           | 将所有暴露的端口发布到随机端口                               |
+| `--pull`                  | `missing` | 运行前拉取图像（“always”\|“missing”\|“never”）               |
+| `--read-only`             |           | 将容器的根文件系统挂载为只读                                 |
+| `--restart`               | `no`      | 容器退出时应用的重启策略                                     |
+| `--rm`                    |           | 容器退出时自动移除                                           |
+| `--runtime`               |           | 用于此容器的运行时                                           |
+| `--security-opt`          |           | 安全选项                                                     |
+| `--shm-size`              |           | /dev/shm 的大小                                              |
+| `--sig-proxy`             | `true`    | 代理接收到的信号给进程                                       |
+| `--stop-signal`           | `SIGTERM` | 停止容器的信号                                               |
+| `--stop-timeout`          |           | [**API 1.25+**](https://docs.docker.com/engine/api/v1.25/) 停止容器的超时（以秒为单位） |
+| `--storage-opt`           |           | 容器的存储驱动程序选项                                       |
+| `--sysctl`                |           | Sysctl 选项                                                  |
+| `--tmpfs`                 |           | 挂载 tmpfs 目录                                              |
+| `--tty`,`-t`              |           | 分配一个伪 TTY                                               |
+| `--ulimit`                |           | 限制选项                                                     |
+| `--user`,`-u`             |           | 用户名或 UID（格式：<name\|uid>[:<group\|gid>]）             |
+| `--userns`                |           | 要使用的用户命名空间                                         |
+| `--uts`                   |           | 要使用的 UTS 命名空间                                        |
+| `--volume`,`-v`           |           | 绑定挂载卷                                                   |
+| `--volume-driver`         |           | 容器的可选卷驱动程序                                         |
+| `--volumes-from`          |           | 从指定容器挂载卷                                             |
+| `--workdir`,`-w`          |           | 容器内的工作目录                                             |
+
 ### extra_hosts
 
 添加主机名映射。类似 `docker client --add-host`。

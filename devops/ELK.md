@@ -578,6 +578,8 @@ Config:  /usr/local/etc/elasticsearch/
 
 **本地浏览器访问 [http://localhost:9200](http://localhost:9200/)**
 
+> 启动两个端口，9200为数据查询和写入端口，也即是业务端口，9300为集群端口，同步集群数据
+
 
 
 ### 修改配置文件
@@ -647,6 +649,9 @@ sql> select * from indexName;
   /_cat/allocation
   3.查看文档总数
   /_cat/count
+  
+  4.查看索引信息
+  /_cat/indices?v
 ```
 
 
@@ -1039,6 +1044,12 @@ filebeat -> rabbitmq -> logagent -> solar
 
 便于日常运维和部署
 
+注意：elastic-stack的各软件的版本要一致，否则错误会不可预知，譬如8.1.0的filebeat就默认不会向8.0.1的elasticsearch做output动作，除非yaml里配置：
+
+```yaml
+output.elasticsearch.allow_old_versions: true
+```
+
 
 
 ## 目标
@@ -1162,6 +1173,42 @@ output {
 
 
 
+## 收集docker容器日志
+
+https://www.cnblogs.com/William-Guozi/p/elk-docker.html
+
+```bash
+mkdir -pv /data/conf
+cat > /data/conf/logstash.conf << "EOF"
+input {
+  beats {
+    host => "0.0.0.0"
+    port => "5043"
+  }
+}
+filter {
+  grok {
+    match => { "message" => "%{TIMESTAMP_ISO8601:log-timestamp} %{LOGLEVEL:log-level} %{JAVALOGMESSAGE:log-msg}" }
+  }
+  mutate {
+#    remove_field => ["message"]
+    remove_field => ["beat"]
+   }
+}
+output {
+  stdout { codec => rubydebug }
+  elasticsearch {
+        hosts => [ "elasticsearch:9200" ]
+        index => "%{containername}-%{+YYYY.MM.dd}"
+  }
+}
+EOF
+```
+
+
+
+
+
 # Todo
 
 - [ ] filebeat收集docker容器中stdout的gin日志到logstash中，在kibana中展示
@@ -1182,4 +1229,3 @@ output {
 - [Filebeat 模块与配置](https://www.cnblogs.com/cjsblog/p/9495024.html)
 - [Kibana7.9.2设置elasticsearch索引过期时间，到期自动删除](https://blog.csdn.net/qq_41631365/article/details/109773675?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-109773675.pc_agg_new_rank&utm_term=elk+%E8%AE%BE%E7%BD%AE%E7%B4%A2%E5%BC%95%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4&spm=1000.2123.3001.4430)
 - [bash-declare/local](https://ss64.com/bash/declare.html)
-- 
