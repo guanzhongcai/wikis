@@ -1226,6 +1226,25 @@ EOF
 
 
 
+> [Run Filebeat on Docker | Filebeat Reference [8.1\] | Elastic](https://www.elastic.co/guide/en/beats/filebeat/current/running-on-docker.html)
+>
+> Running Filebeat with the setup command will create the index pattern and load visualizations , dashboards, and machine learning jobs. Run this command:
+
+```bash
+# 进入容器中
+
+# 复制只读配置文件，默认filebeat.yml是filebeat用户的，非root用户的
+cp filebeat.yml filebeat-c.yml
+
+./filebeat -c filebeat-c.yml setup -E setup.kibana.host=kibana:5601
+Overwriting ILM policy is disabled. Set `setup.ilm.overwrite: true` for enabling.
+
+Index setup finished.
+Loading dashboards (Kibana must be running and reachable)
+Loaded dashboards
+Loaded Ingest pipelines
+```
+
 
 
 # OKR
