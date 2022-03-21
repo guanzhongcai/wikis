@@ -578,6 +578,8 @@ Config:  /usr/local/etc/elasticsearch/
 
 **本地浏览器访问 [http://localhost:9200](http://localhost:9200/)**
 
+> 启动两个端口，9200为数据查询和写入端口，也即是业务端口，9300为集群端口，同步集群数据
+
 
 
 ### 修改配置文件
@@ -647,6 +649,9 @@ sql> select * from indexName;
   /_cat/allocation
   3.查看文档总数
   /_cat/count
+  
+  4.查看索引信息
+  /_cat/indices?v
 ```
 
 
@@ -1051,6 +1056,12 @@ filebeat -> rabbitmq -> logagent -> solar
 
 便于日常运维和部署
 
+注意：elastic-stack的各软件的版本要一致，否则错误会不可预知，譬如8.1.0的filebeat就默认不会向8.0.1的elasticsearch做output动作，除非yaml里配置：
+
+```yaml
+output.elasticsearch.allow_old_versions: true
+```
+
 
 
 ## 目标
@@ -1174,14 +1185,50 @@ output {
 
 
 
+
 > - 账户elastic为elasticsearch超级管理员，拥有所有权限
 > - 账户kibana用于kibana组件获取相关信息用于web展示
 > - 账户logstash_system用于logstash服务获取elasticsearch的监控数据
 
 
 
-# OKR
+## 收集docker容器日志
 
+https://www.cnblogs.com/William-Guozi/p/elk-docker.html
+
+```bash
+mkdir -pv /data/conf
+cat > /data/conf/logstash.conf << "EOF"
+input {
+  beats {
+    host => "0.0.0.0"
+    port => "5043"
+  }
+}
+filter {
+  grok {
+    match => { "message" => "%{TIMESTAMP_ISO8601:log-timestamp} %{LOGLEVEL:log-level} %{JAVALOGMESSAGE:log-msg}" }
+  }
+  mutate {
+#    remove_field => ["message"]
+    remove_field => ["beat"]
+   }
+}
+output {
+  stdout { codec => rubydebug }
+  elasticsearch {
+        hosts => [ "elasticsearch:9200" ]
+        index => "%{containername}-%{+YYYY.MM.dd}"
+  }
+}
+EOF
+```
+
+
+
+
+
+# OKR
 - [ ] filebeat收集docker容器中stdout的gin日志到logstash中，在kibana中展示
 - [ ] 多输入源、多过滤器、输出到不同的es的索引中
 - [ ] 同理，abp、springboot等
@@ -1232,16 +1279,22 @@ output {
 
 
 
-- 写好的ruby脚本直接放入`logstash/pipeline`目录，即会自动加载
+- [ ] 写好的ruby脚本直接放入`logstash/pipeline`目录，即会自动加载
+- [ ] source
+- [ ] 索引的过期策略
+- [ ] 自动收集docker容器的日志并展示在kibana侧
 
 
 
 ## 参考资料
 
 - [Elastic Stack（ELK）从入门到实践](https://www.bilibili.com/video/BV1iJ411c7Az?t=82&p=60)
-
 - [filebeat-中文指南](https://elkguide.elasticsearch.cn/beats/file.html)
 - [Filebeat 模块与配置](https://www.cnblogs.com/cjsblog/p/9495024.html)
+<<<<<<< HEAD
 
 - [ElasticSearch常用配置（内置账号密码修改、自定义角色自定义账号，日志定期删除等)..._weixin_34198762的博客-CSDN博客](https://blog.csdn.net/weixin_34198762/article/details/91639931)
 - [logstash匹配filebeat传递的log.file.path_禅剑一如的博客-CSDN博客](https://blog.csdn.net/zsx18273117003/article/details/106383636)
+=======
+- [Kibana7.9.2设置elasticsearch索引过期时间，到期自动删除](https://blog.csdn.net/qq_41631365/article/details/109773675?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-109773675.pc_agg_new_rank&utm_term=elk+%E8%AE%BE%E7%BD%AE%E7%B4%A2%E5%BC%95%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4&spm=1000.2123.3001.4430)
+- [bash-declare/local](https://ss64.com/bash/declare.html)
