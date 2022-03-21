@@ -726,6 +726,10 @@ http://localhost:9100/?auth_user=elastic&auth_password=changeme
 
 
 
+**`yellow`**
+
+所有的主分片已经分片了，但至少还有一个副本是缺失的。不会有数据丢失，所以搜索结果依然是完整的。不过，你的高可用性在某种程度上被弱化。如果 *更多的* 分片消失，你就会丢数据了。把 `yellow` 想象成一个需要及时调查的警告。
+
 
 
 
@@ -782,6 +786,14 @@ x server：连接linux系统的windows的UI工具
    # 启动filebet
    ./filebeat -e -c itcast-nginx.yml
    ```
+
+
+
+查询条件：
+
+```kibana
+service.app : "gateway" and host.ip : "10.8.82.20"
+```
 
 
 
@@ -1162,14 +1174,65 @@ output {
 
 
 
-# Todo
+> - 账户elastic为elasticsearch超级管理员，拥有所有权限
+> - 账户kibana用于kibana组件获取相关信息用于web展示
+> - 账户logstash_system用于logstash服务获取elasticsearch的监控数据
+
+
+
+# OKR
 
 - [ ] filebeat收集docker容器中stdout的gin日志到logstash中，在kibana中展示
 - [ ] 多输入源、多过滤器、输出到不同的es的索引中
 - [ ] 同理，abp、springboot等
 - [x] grok
 - [ ] tag：是针对不同的Service来设定的
-- [ ] source
+- [ ] 配置abp的filter较繁琐，因为不规范，需要熟悉grok语法和自测，配置modules如iis和pg，可省去这步。springboot的可能现成的多
+- [x] 宿主机IP的检索
+- [ ] ILM的配置
+- [ ] 默认索引的规则
+
+
+
+**1. d:/usr2/local/etc/logstash/pipeline1目录下logstash.conf配置文件**
+
+```ruby
+input { 
+    stdin { } 
+    beats {
+        port => 5044
+    }
+}
+ 
+filter {
+    ruby {
+        code => "
+            path = event.get('log')['file']['path']
+            puts format('path = %<path>s', path: path)
+            if (!path.nil?) && (!path.empty?)
+                event.set('app', path.split('/')[-2])
+            end
+        "
+    }
+}
+ 
+output {
+	stdout { codec => rubydebug }
+}
+```
+
+
+
+重启验证：
+
+```bash
+~/repos/docker-elk$ docker restart docker-elk_logstash_1
+~/repos/docker-elk$ docker logs -f docker-elk_logstash_1
+```
+
+
+
+- 写好的ruby脚本直接放入`logstash/pipeline`目录，即会自动加载
 
 
 
@@ -1180,3 +1243,5 @@ output {
 - [filebeat-中文指南](https://elkguide.elasticsearch.cn/beats/file.html)
 - [Filebeat 模块与配置](https://www.cnblogs.com/cjsblog/p/9495024.html)
 
+- [ElasticSearch常用配置（内置账号密码修改、自定义角色自定义账号，日志定期删除等)..._weixin_34198762的博客-CSDN博客](https://blog.csdn.net/weixin_34198762/article/details/91639931)
+- [logstash匹配filebeat传递的log.file.path_禅剑一如的博客-CSDN博客](https://blog.csdn.net/zsx18273117003/article/details/106383636)
