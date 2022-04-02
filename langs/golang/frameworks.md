@@ -99,3 +99,5 @@
 
 - [Go Micro入门](http://www.topgoer.com/%E5%BE%AE%E6%9C%8D%E5%8A%A1/GoMicro%E5%85%A5%E9%97%A8.html)
 
+- [B站Golang后台架构](https://www.jianshu.com/p/b8e29b68252f?from=message&isappinstalled=0)
+- [今日头条Go建千亿级微服务的实践](https://studygolang.com/articles/10117)
