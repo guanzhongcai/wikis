@@ -682,6 +682,279 @@ ObjectMapper 是 Jackson 提供的一个类，作用是将 java 对象与 json �
 
 
 
+## AOP
+
+https://www.cnblogs.com/joy99/p/10941543.html
+
+IBuy.java：
+
+```java
+package com.sharpcj.aopdemo.test1;
+
+public interface IBuy {
+    String buy();
+}
+```
+
+Boy.java
+
+```java
+package com.sharpcj.aopdemo.test1;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Boy implements IBuy {
+    @Override
+    public String buy() {
+        System.out.println("男孩买了一个游戏机");
+        return "游戏机";
+    }
+}
+```
+
+Girl.java
+
+```java
+package com.sharpcj.aopdemo.test1;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class Girl implements IBuy {
+    @Override
+    public String buy() {
+        System.out.println("女孩买了一件漂亮的衣服");
+        return "衣服";
+    }
+}
+```
+
+配置文件, AppConfig.java
+
+```java
+package com.sharpcj.aopdemo;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ComponentScan(basePackageClasses = {com.sharpcj.aopdemo.test1.IBuy.class})
+public class AppConfig {
+}
+```
+
+测试类， AppTest.java
+
+```java
+package com.sharpcj.aopdemo;
+
+import com.sharpcj.aopdemo.test1.Boy;
+import com.sharpcj.aopdemo.test1.Girl;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class AppTest {
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        Boy boy = context.getBean("boy",Boy.class);
+        Girl girl = (Girl) context.getBean("girl");
+        boy.buy();
+        girl.buy();
+    }
+}
+```
+
+
+
+这里运用SpringIOC里的自动部署。现在需求改变了，我们需要在男孩和女孩的 buy 方法之前，需要打印出“男孩女孩都买了自己喜欢的东西”。用 Spring AOP 来实现这个需求只需下面几个步骤：
+
+1、 **既然用到 Spring AOP, 首先在 `build.gralde` 文件中引入相关依赖：**
+
+```groovy
+dependencies {
+    compile 'org.springframework:spring-context:5.0.6.RELEASE'
+    compile 'org.springframework:spring-aspects:5.0.6.RELEASE'
+}
+```
+
+2、 **定义一个切面类，BuyAspectJ.java**
+
+```java
+package com.sharpcj.aopdemo.test1;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class BuyAspectJ {
+    @Before("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..))")
+    public void haha(){
+        System.out.println("男孩女孩都买自己喜欢的东西");
+    }
+}
+```
+
+这个类，我们使用了注解 `@Component` 表明它将作为一个Spring Bean 被装配，使用注解 `@Aspect` 表示它是一个切面。
+类中只有一个方法 `haha` 我们使用 `@Before` 这个注解，表示他将在方法执行之前执行。关于这个注解后文再作解释。
+参数`("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..))")` 声明了切点，表明在该切面的切点是`com.sharpcj.aopdemo.test1.Ibuy`这个接口中的`buy`方法。
+
+
+
+3、 **在配置文件中启用AOP切面功能**
+
+```java
+package com.sharpcj.aopdemo;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+
+@Configuration
+@ComponentScan(basePackageClasses = {com.sharpcj.aopdemo.test1.IBuy.class})
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+public class AppConfig {
+}
+```
+
+没有修改 Boy 和 Girl 类的 Buy 方法，也没有修改测试类的代码，几乎是完全无侵入式地实现了需求。这就是 AOP 的“神奇”之处。
+
+![758949-20190529225530124-1714809272](../../images/758949-20190529225530124-1714809272.png)
+
+```java
+package com.sharpcj.aopdemo.test1;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class BuyAspectJ {
+    @Before("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..)) && within(com.sharpcj.aopdemo.test1.*) && bean(girl)")
+    public void hehe(){
+        System.out.println("男孩女孩都买自己喜欢的东西");
+    }
+}
+```
+
+![758949-20190529225613898-1522094074](../../images/758949-20190529225613898-1522094074.png)
+
+修改切面类：
+
+```java
+package com.sharpcj.aopdemo.test1;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class BuyAspectJ {
+    @Before("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..))")
+    public void hehe() {
+        System.out.println("before ...");
+    }
+
+    @After("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..))")
+    public void haha() {
+        System.out.println("After ...");
+    }
+
+    @AfterReturning("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..))")
+    public void xixi() {
+        System.out.println("AfterReturning ...");
+    }
+
+    @Around("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..))")
+    public void xxx(ProceedingJoinPoint pj) {
+        try {
+            System.out.println("Around aaa ...");
+            pj.proceed();
+            System.out.println("Around bbb ...");
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+}
+```
+
+测试代码：
+
+```java
+package com.sharpcj.aopdemo;
+
+import com.sharpcj.aopdemo.test1.Boy;
+import com.sharpcj.aopdemo.test1.Girl;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class AppTest {
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        Boy boy = context.getBean("boy",Boy.class);
+        Girl girl = (Girl) context.getBean("girl");
+        boy.buy();
+        // girl.buy();
+    }
+}
+```
+
+
+
+![758949-20190529225633682-474468038](../../images/758949-20190529225633682-474468038-20220404172137923.png)
+
+### 通过注解声明切点表达式
+
+BuyAspectJ.java
+
+```java
+package com.sharpcj.aopdemo.test1;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class BuyAspectJ {
+
+  	// 切点表达式
+    @Pointcut("execution(* com.sharpcj.aopdemo.test1.IBuy.buy(..))")
+    public void point(){}
+
+    @Before("point()")
+    public void hehe() {
+        System.out.println("before ...");
+    }
+
+    @After("point()")
+    public void haha() {
+        System.out.println("After ...");
+    }
+
+    @AfterReturning("point()")
+    public void xixi() {
+        System.out.println("AfterReturning ...");
+    }
+
+    @Around("point()")
+    public void xxx(ProceedingJoinPoint pj) {
+        try {
+            System.out.println("Around aaa ...");
+            pj.proceed();
+            System.out.println("Around bbb ...");
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+}
+```
+
+
+
 ## Questions
 
 - JVM的常用调优参数有哪些？

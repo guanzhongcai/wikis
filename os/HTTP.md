@@ -315,6 +315,73 @@ r.RunTLS(":9999", "./server.pem", "./server.key")
 
 
 
+# keep-alive
+
+> https://www.cnblogs.com/caoweixiong/p/14720254.html
+
+keep-alive 是客户端和服务端的一个约定，如果开启 keep-alive，则服务端在返回 response 后不关闭 TCP 连接；
+
+**连接**能够在**短时间**内得到复用
+
+- HTTP 1.0 中默认是关闭的，需要在http头加入"Connection: Keep-Alive"，才能启用Keep-Alive；
+- HTTP 1.1 中默认启用Keep-Alive，如果加入"Connection: close "，才关闭。
+
+
+
+## 使用场景
+
+- **如果客户端和服务端的确需要进行多次通信，则开启 keep-alive 是更好的选择**，例如在微服务架构中，通常微服务的使用方和提供方会长期有交流。
+
+- **在一些 TPS/QPS 很高的 REST 服务中，如果使用的是短连接（即没有开启keep-alive），则很可能发生`客户端端口`被占满的情形**。
+
+  这是由于短时间内会创建大量TCP 连接，而在 TCP 四次挥手结束后，客户端的端口会处于 TIME_WAIT一段时间(2*MSL)，
+
+  这期间端口不会被释放，从而导致端口被占满。这种情况下最好使用长连接。
+
+
+
+## **如何处理keep-alive**
+
+对于**客户端**来说，不论是浏览器，还是手机App，或者我们直接在Java代码中使用HttpUrlConnection，**只是负责在请求头中设置Keep-Alive**。
+
+而**具体的连接复用时间的长短，通常是由web服务器控制的**。
+
+**在HTTP协议中，Keep-Alive属性保持连接的时间长短是由服务端决定的，通常配置都是在几十秒左右。**
+
+例如，在tomcat中，我们可以server.xml中配置以下属性：
+
+![img](HTTP.assets/1577453-20210429234231235-636607618.png)
+
+说明如下：
+
+- **maxKeepAliveRequests：**一个连接上，最多可以发起多少次请求，默认100，超过这个次数后会关闭。
+- **keepAliveTimeout：**底层socket连接最多保持多长时间，默认60秒，超过这个时间连接会被关闭。 
+
+当然，这不是所有内容，在一些异常情况下，keepalive也会失效。tomcat会根据http响应的状态码，判断是否需要丢弃连接
+
+
+
+## **客户端如何开启？**
+
+现在我们用到的几乎所有工具都是默认开启长连接的：
+
+- 对于**浏览器**而言，几乎你现在用的浏览器（包括 IE6）都默认使用 keep-alive 了。
+- **Java8** 中的 **`HttpURLConnection`** 默认开启长连接，但是默认连接池中只保留 5 个长连接，如果同时超过 5 个在使用，则会创建新的连接，结束后多于 5 个的部分会被客户端主动关闭。
+- **Apache `HttpClient`** 默认为每个地址保留 2 个长连接，连接池中最多共保留 20 个连接。
+- **Python requests** 如果使用 session 则会默认开启长连接。
+
+
+
+## **HTTP与TCP中keep-alive的区别**
+
+- **HTTP协议(七层)**的Keep-Alive意图在于**连接复用**，希望可以短时间内在同一个连接上进行多次请求/响应。**核心在于：时间要短，速度要快。**
+
+- **TCP协议(四层)**的KeepAlive机制意图在于**保活、心跳，检测连接错误**。**核心在于：虽然频率低，但是持久。**
+
+　　  当一个TCP连接两端长时间没有数据传输时(通常默认配置是2小时)，发送keepalive探针，探测链接是否存活。
+
+ 
+
 # 参考资料：
 
 - [HTTP简介](https://www.runoob.com/http/http-tutorial.html)
