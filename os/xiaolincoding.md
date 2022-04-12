@@ -741,3 +741,22 @@ NAT将自动修改IP[报文](https://baike.baidu.com/item/报文)的源IP地址�
 - 可以发现，信号初始化为 `0`，就代表着是**同步信号量**，它可以保证进程 A 应在进程 B 之前执行。
 
   ![img](xiaolincoding.assets/11-信号量-同步.jpg)
+
+### Socket
+
+针对 UDP 协议通信的 socket 编程模型：
+
+![img](xiaolincoding.assets/13-UDP编程模型.jpg)
+
+- UDP 是没有连接的，所以不需要三次握手，也就不需要像 TCP 调用 listen 和 connect，但是 UDP 的交互仍然需要 IP 地址和端口号，因此也需要 bind。
+- 另外，每次通信时，调用 sendto 和 recvfrom，都要传入目标主机的 IP 地址和端口。
+
+```c
+int socket(int domain, int type, int protocal)
+```
+
+- domain 参数用来指定协议族，比如 AF_INET 用于 IPV4、AF_INET6 用于 IPV6、AF_LOCAL/AF_UNIX 用于本机；
+- type 参数用来指定通信特性，比如 SOCK_STREAM 表示的是字节流，对应 TCP、SOCK_DGRAM 表示的是数据报，对应 UDP、SOCK_RAW 表示的是原始套接字；
+- protocal 参数原本是用来指定通信协议的，但现在基本废弃。因为协议已经通过前面两个参数指定完成，protocol 目前一般写成 0 即可；
+
+本地字节流 socket 和 本地数据报 socket 在 bind 的时候，不像 TCP 和 UDP 要绑定 IP 地址和端口，而是**绑定一个本地文件**，这也就是它们之间的最大区别。
