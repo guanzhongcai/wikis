@@ -20,6 +20,35 @@
 
 
 
+## chan实现原理
+
+源码目录位置：`runtime/chan.go`，以下贴出chan 类型的数据结构如下：
+
+```go
+type hchan struct {
+ qcount   uint           // total data in the queue（循环队列元素数量）
+ dataqsiz uint           // size of the circular queue（循环队列大小）
+ buf      unsafe.Pointer // points to an array of dataqsiz elements（循环队列指针）
+ elemsize uint16 //chan中元素大小
+ closed   uint32 //是否已经close
+ elemtype *_type // element type（chan元素类型）
+ sendx    uint   // send index（send在buf中索引）
+ recvx    uint   // receive index（recv在buf中索引）
+ recvq    waitq  // list of recv waiters（receive的等待队列）
+ sendq    waitq  // list of send waiters（sender等待队列）
+
+ // lock protects all fields in hchan, as well as several
+ // fields in sudogs blocked on this channel.
+ //
+ // Do not change another G's status while holding this lock
+ // (in particular, do not ready a G), as this can deadlock
+ // with stack shrinking.
+ lock mutex //互斥锁，保护所有字段，上面注释已经讲得非常明确了
+}
+```
+
+
+
 ## GMP模型
 
 > https://zhuanlan.zhihu.com/p/413218471
@@ -126,6 +155,8 @@ func schedule() {
 ### 阻塞处理
 
 以上只是假设G正常执行的情况。如果G存在阻塞等待（如channel、系统调用）等，那么需要将此时此刻的M与P上的G进行解绑，让M执行其他P上的G，从而最大化提升CPU利用率。
+
+![img](go-memo.assets/webp)
 
 
 
