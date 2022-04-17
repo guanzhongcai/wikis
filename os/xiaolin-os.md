@@ -760,3 +760,223 @@ int socket(int domain, int type, int protocal)
 - protocal 参数原本是用来指定通信协议的，但现在基本废弃。因为协议已经通过前面两个参数指定完成，protocol 目前一般写成 0 即可；
 
 本地字节流 socket 和 本地数据报 socket 在 bind 的时候，不像 TCP 和 UDP 要绑定 IP 地址和端口，而是**绑定一个本地文件**，这也就是它们之间的最大区别。
+
+
+
+## 利用工具排查死锁问题
+
+如果你想排查你的 Java 程序是否死锁，则可以使用 `jstack` 工具，它是 jdk 自带的线程堆栈分析工具。
+
+由于小林的死锁代码例子是 C 写的，在 Linux 下，我们可以使用 `pstack` + `gdb` 工具来定位死锁问题。
+
+pstack 命令可以显示每个线程的栈跟踪信息（函数调用过程），它的使用方式也很简单，只需要 `pstack <pid>` 就可以了。
+
+那么，在定位死锁问题时，我们可以多次执行 pstack 命令查看线程的函数调用过程，多次对比结果，确认哪几个线程一直没有变化，且是因为在等待锁，那么大概率是由于死锁问题导致的。
+
+```bash
+$ pstack 87746
+Thread 3 (Thread 0x7f60a610a700 (LWP 87747)):
+#0  0x0000003720e0da1d in __lll_lock_wait () from /lib64/libpthread.so.0
+#1  0x0000003720e093ca in _L_lock_829 () from /lib64/libpthread.so.0
+#2  0x0000003720e09298 in pthread_mutex_lock () from /lib64/libpthread.so.0
+#3  0x0000000000400725 in threadA_proc ()
+#4  0x0000003720e07893 in start_thread () from /lib64/libpthread.so.0
+#5  0x00000037206f4bfd in clone () from /lib64/libc.so.6
+Thread 2 (Thread 0x7f60a5709700 (LWP 87748)):
+#0  0x0000003720e0da1d in __lll_lock_wait () from /lib64/libpthread.so.0
+#1  0x0000003720e093ca in _L_lock_829 () from /lib64/libpthread.so.0
+#2  0x0000003720e09298 in pthread_mutex_lock () from /lib64/libpthread.so.0
+#3  0x0000000000400792 in threadB_proc ()
+#4  0x0000003720e07893 in start_thread () from /lib64/libpthread.so.0
+#5  0x00000037206f4bfd in clone () from /lib64/libc.so.6
+Thread 1 (Thread 0x7f60a610c700 (LWP 87746)):
+#0  0x0000003720e080e5 in pthread_join () from /lib64/libpthread.so.0
+#1  0x0000000000400806 in main ()
+
+....
+
+$ pstack 87746
+Thread 3 (Thread 0x7f60a610a700 (LWP 87747)):
+#0  0x0000003720e0da1d in __lll_lock_wait () from /lib64/libpthread.so.0
+#1  0x0000003720e093ca in _L_lock_829 () from /lib64/libpthread.so.0
+#2  0x0000003720e09298 in pthread_mutex_lock () from /lib64/libpthread.so.0
+#3  0x0000000000400725 in threadA_proc ()
+#4  0x0000003720e07893 in start_thread () from /lib64/libpthread.so.0
+#5  0x00000037206f4bfd in clone () from /lib64/libc.so.6
+Thread 2 (Thread 0x7f60a5709700 (LWP 87748)):
+#0  0x0000003720e0da1d in __lll_lock_wait () from /lib64/libpthread.so.0
+#1  0x0000003720e093ca in _L_lock_829 () from /lib64/libpthread.so.0
+#2  0x0000003720e09298 in pthread_mutex_lock () from /lib64/libpthread.so.0
+#3  0x0000000000400792 in threadB_proc ()
+#4  0x0000003720e07893 in start_thread () from /lib64/libpthread.so.0
+#5  0x00000037206f4bfd in clone () from /lib64/libc.so.6
+Thread 1 (Thread 0x7f60a610c700 (LWP 87746)):
+#0  0x0000003720e080e5 in pthread_join () from /lib64/libpthread.so.0
+#1  0x0000000000400806 in main ()
+```
+
+可以看到，Thread 2 和 Thread 3 一直阻塞获取锁（*pthread_mutex_lock*）的过程，而且 pstack 多次输出信息都没有变化，那么可能大概率发生了死锁。
+
+
+
+整个 gdb 调试过程，如下：
+
+```bash
+// gdb 命令
+$ gdb -p 87746
+
+// 打印所有的线程信息
+(gdb) info thread
+  3 Thread 0x7f60a610a700 (LWP 87747)  0x0000003720e0da1d in __lll_lock_wait () from /lib64/libpthread.so.0
+  2 Thread 0x7f60a5709700 (LWP 87748)  0x0000003720e0da1d in __lll_lock_wait () from /lib64/libpthread.so.0
+* 1 Thread 0x7f60a610c700 (LWP 87746)  0x0000003720e080e5 in pthread_join () from /lib64/libpthread.so.0
+//最左边的 * 表示 gdb 锁定的线程，切换到第二个线程去查看
+
+// 切换到第2个线程
+(gdb) thread 2
+[Switching to thread 2 (Thread 0x7f60a5709700 (LWP 87748))]#0  0x0000003720e0da1d in __lll_lock_wait () from /lib64/libpthread.so.0 
+
+// bt 可以打印函数堆栈，却无法看到函数参数，跟 pstack 命令一样 
+(gdb) bt
+#0  0x0000003720e0da1d in __lll_lock_wait () from /lib64/libpthread.so.0
+#1  0x0000003720e093ca in _L_lock_829 () from /lib64/libpthread.so.0
+#2  0x0000003720e09298 in pthread_mutex_lock () from /lib64/libpthread.so.0
+#3  0x0000000000400792 in threadB_proc (data=0x0) at dead_lock.c:25
+#4  0x0000003720e07893 in start_thread () from /lib64/libpthread.so.0
+#5  0x00000037206f4bfd in clone () from /lib64/libc.so.6
+
+// 打印第三帧信息，每次函数调用都会有压栈的过程，而 frame 则记录栈中的帧信息
+(gdb) frame 3
+#3  0x0000000000400792 in threadB_proc (data=0x0) at dead_lock.c:25
+27    printf("thread B waiting get ResourceA \n");
+28    pthread_mutex_lock(&mutex_A);
+
+// 打印mutex_A的值 ,  __owner表示gdb中标示线程的值，即LWP
+(gdb) p mutex_A
+$1 = {__data = {__lock = 2, __count = 0, __owner = 87747, __nusers = 1, __kind = 0, __spins = 0, __list = {__prev = 0x0, __next = 0x0}}, 
+  __size = "\002\000\000\000\000\000\000\000\303V\001\000\001", '\000' <repeats 26 times>, __align = 2}
+
+// 打印mutex_B的值 ,  __owner表示gdb中标示线程的值，即LWP
+(gdb) p mutex_B
+$2 = {__data = {__lock = 2, __count = 0, __owner = 87748, __nusers = 1, __kind = 0, __spins = 0, __list = {__prev = 0x0, __next = 0x0}}, 
+  __size = "\002\000\000\000\000\000\000\000\304V\001\000\001", '\000' <repeats 26 times>, __align = 2}  
+```
+
+解释下，上面的调试过程（LWP：Light Weight Process 轻量级进程）：
+
+1. 通过 `info thread` 打印了所有的线程信息，可以看到有 3 个线程，一个是主线程（LWP 87746），另外两个都是我们自己创建的线程（LWP 87747 和 87748）；
+2. 通过 `thread 2`，将切换到第 2 个线程（LWP 87748）；
+3. 通过 `bt`，打印线程的调用栈信息，可以看到有 threadB_proc 函数，说明这个是线程 B 函数，也就说 LWP 87748 是线程 B;
+4. 通过 `frame 3`，打印调用栈中的第三个帧的信息，可以看到线程 B 函数，在获取互斥锁 A 的时候阻塞了；
+5. 通过 `p mutex_A`，打印互斥锁 A 对象信息，可以看到它被 LWP 为 87747（线程 A） 的线程持有着；
+6. 通过 `p mutex_B`，打印互斥锁 A 对象信息，可以看到他被 LWP 为 87748 （线程 B） 的线程持有着；
+
+因为线程 B 在等待线程 A 所持有的 mutex_A, 而同时线程 A 又在等待线程 B 所拥有的mutex_B, 所以可以断定该程序发生了死锁。
+
+> 轻量级进程 (LWP, light weight process) 是一种由[内核](https://baike.baidu.com/item/内核)支持的用户线程。它是基于[内核](https://baike.baidu.com/item/内核)线程的高级抽象，因此只有先支持[内核](https://baike.baidu.com/item/内核)线程，才能有 LWP 。每一个LWP可以支持一个或多个用户线程，每个 LWP 由一个[内核](https://baike.baidu.com/item/内核)线程支持。内核线程与LWP之间的模型实际上就是《[操作系统概念](https://baike.baidu.com/item/操作系统概念/8259031)》上所提到的一对一线程模型。在这种实现的操作系统中， LWP 相当于[用户线程](https://baike.baidu.com/item/用户线程)。 由于每个 LWP 都与一个特定的内核线程关联，因此每个 LWP 都是一个独立的[线程调度](https://baike.baidu.com/item/线程调度)单元。即使有一个 LWP 在[系统调用](https://baike.baidu.com/item/系统调用)中阻塞，也不会影响整个进程的执行。
+
+
+
+死锁问题的产生是由两个或者以上线程并行执行的时候，争夺资源而互相等待造成的。
+
+死锁只有同时满足互斥、持有并等待、不可剥夺、环路等待这四个条件的时候才会发生。
+
+所以要避免死锁问题，就是要破坏其中一个条件即可，最常用的方法就是使用资源有序分配法来破坏环路等待条件。
+
+
+
+## 锁
+
+**对于互斥锁加锁失败而阻塞的现象，是由操作系统内核实现的**。当加锁失败时，内核会将线程置为「睡眠」状态，等到锁被释放后，内核会在合适的时机唤醒线程，当这个线程成功获取到锁后，于是就可以继续执行。
+
+![img](xiaolin-os.assets/互斥锁工作流程.png)
+
+所以，互斥锁加锁失败时，会从用户态陷入到内核态，让内核帮我们切换线程，虽然简化了使用锁的难度，但是存在一定的性能开销成本。
+
+那这个开销成本是什么呢？会有**两次线程上下文切换的成本**：
+
+- 当线程加锁失败时，内核会把线程的状态从「运行」状态设置为「睡眠」状态，然后把 CPU 切换给其他线程运行；
+- 接着，当锁被释放时，之前「睡眠」状态的线程会变为「就绪」状态，然后内核会在合适的时间，把 CPU 切换给该线程运行。
+
+
+
+线程的上下文切换的是什么？当两个线程是属于同一个进程，**因为虚拟内存是共享的，所以在切换时，虚拟内存这些资源就保持不动，只需要切换线程的私有数据、寄存器等不共享的数据。**
+
+
+
+**上下切换的耗时**有大佬统计过，大概在几十纳秒到几微秒之间，如果你锁住的代码执行时间比较短，那可能上下文切换的时间都比你锁住的代码执行时间还要长。
+
+
+
+所以，**如果你能确定被锁住的代码执行时间很短，就不应该用互斥锁，而应该选用自旋锁。否则使用互斥锁。**
+
+
+
+自旋锁是通过 CPU 提供的 `CAS` 函数（*Compare And Swap*），在「用户态」完成加锁和解锁操作，不会主动产生线程上下文切换，所以相比互斥锁来说，会快一些，开销也小一些。
+
+
+
+比如，设锁为变量 lock，整数 0 表示锁是空闲状态，整数 `pid 表示线程 ID`，那么 `CAS(lock, 0, pid)` 就表示自旋锁的加锁操作，`CAS(lock, pid, 0)` 则表示解锁操作。
+
+
+
+使用自旋锁的时候，当发生多线程竞争锁的情况，加锁失败的线程会「忙等待」，直到它拿到锁。这里的「忙等待」可以用 `while` 循环等待实现，不过最好是使用 CPU 提供的 `PAUSE` 指令来实现「忙等待」，因为可以减少循环等待时的耗电量。
+
+
+
+自旋锁是最比较简单的一种锁，一直自旋，利用 CPU 周期，直到锁可用。**需要注意，在单核 CPU 上，需要抢占式的调度器（即不断通过时钟中断一个线程，运行其他线程）。否则，自旋锁在单 CPU 上无法使用，因为一个自旋的线程永远不会放弃 CPU。**
+
+
+
+自旋锁开销少，在多核系统下一般不会主动产生线程切换，适合异步、协程等在用户态切换请求的编程方式，但如果被锁住的代码执行时间过长，自旋的线程会长时间占用 CPU 资源，所以自旋的时间和被锁住的代码执行的时间是成「正比」的关系，我们需要清楚的知道这一点。
+
+
+
+自旋锁与互斥锁使用层面比较相似，但实现层面上完全不同：**当加锁失败时，互斥锁用「线程切换」来应对，自旋锁则用「忙等待」来应对**。
+
+
+
+它俩是锁的最基本处理方式，更高级的锁都会选择其中一个来实现，比如读写锁既可以选择互斥锁实现，也可以基于自旋锁实现。
+
+
+
+### 读写锁
+
+而写优先锁是优先服务写线程，其工作方式是：当读线程 A 先持有了读锁，写线程 B 在获取写锁的时候，会被阻塞，并且在阻塞过程中，后续来的读线程 C 获取读锁时会失败，于是读线程 C 将被阻塞在获取读锁的操作，这样只要读线程 A 释放读锁后，写线程 B 就可以成功获取读锁。
+
+读优先锁对于读线程并发性更好，但也不是没有问题。我们试想一下，如果一直有读线程获取读锁，那么写线程将永远获取不到写锁，这就造成了写线程「饥饿」的现象。
+
+写优先锁可以保证写线程不会饿死，但是如果一直有写线程获取写锁，读线程也会被「饿死」。
+
+**公平读写锁比较简单的一种方式是：用队列把获取锁的线程排队，不管是写线程还是读线程都按照先进先出的原则加锁即可，这样读线程仍然可以并发，也不会出现「饥饿」的现象。**
+
+
+
+### 乐观锁与悲观锁
+
+悲观锁做事比较悲观，它认为**多线程同时修改共享资源的概率比较高，于是很容易出现冲突，所以访问共享资源前，先要上锁**。
+
+乐观锁做事比较乐观，它假定冲突的概率很低，它的工作方式是：**先修改完共享资源，再验证这段时间内有没有发生冲突，如果没有其他线程在修改资源，那么操作完成，如果发现有其他线程已经修改过这个资源，就放弃本次操作**。
+
+放弃后如何重试，这跟业务场景息息相关，虽然重试的成本很高，但是冲突的概率足够低的话，还是可以接受的。
+
+**乐观锁全程并没有加锁，所以它也叫无锁编程**。
+
+乐观锁使用场景：
+
+- 在线文档
+- SVN
+- git
+
+乐观锁虽然去除了加锁解锁的操作，但是一旦发生冲突，重试的成本非常高，所以**只有在冲突概率非常低，且加锁成本非常高的场景时，才考虑使用乐观锁。**
+
+
+
+
+
+## 调度算法
+
+缺页中断
+
+![缺页中断的处理流程](xiaolin-os.assets/缺页异常流程.png)
+
